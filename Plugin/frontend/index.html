@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subex — $SBX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0a0c;
+    --surface:   #111116;
+    --border:    #1e1e28;
+    --border-hi: #2e2e3e;
+    --blue:      #2563ff;
+    --blue-dim:  #1a3aad;
+    --blue-glow: rgba(37,99,255,0.18);
+    --text:      #e8e8f0;
+    --muted:     #5a5a72;
+    --muted-hi:  #8888aa;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --amber:     #f59e0b;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Scan-line texture ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.06) 2px,
+      rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── Header ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,12,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 56px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo-name {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .logo-ticker {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--blue);
+    letter-spacing: 0.12em;
+    border: 1px solid var(--blue-dim);
+    padding: 2px 6px;
+    border-radius: 2px;
+    background: var(--blue-glow);
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted-hi);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* ── Layout ── */
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 240px;
+    height: 1px;
+    background: var(--blue);
+    box-shadow: 0 0 12px var(--blue);
+  }
+
+  .hero-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--blue);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-family: var(--sans);
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 20px;
+    max-width: 720px;
+  }
+
+  .hero-title span {
+    color: var(--blue);
+  }
+
+  .hero-sub {
+    color: var(--muted-hi);
+    max-width: 520px;
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  /* ── Stats bar ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 48px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stat {
+    background: var(--surface);
+    padding: 20px 24px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .stat:hover { background: #141420; }
+
+  .stat-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: var(--sans);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .stat-value.blue  { color: var(--blue); }
+  .stat-value.green { color: var(--green); }
+
+  .stat-delta {
+    font-size: 10px;
+    color: var(--green);
+    margin-top: 4px;
+  }
+
+  /* ── Section headers ── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .section-count {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    text-transform: uppercase;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── Plans grid ── */
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .plan-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--blue);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+    transform-origin: left;
+  }
+
+  .plan-card:hover {
+    border-color: var(--blue-dim);
+    transform: translateY(-1px);
+  }
+
+  .plan-card:hover::before { transform: scaleX(1); }
+
+  .plan-card.active-plan {
+    border-color: var(--blue-dim);
+    background: rgba(37,99,255,0.04);
+  }
+
+  .plan-card.active-plan::before { transform: scaleX(1); }
+
+  .plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .plan-name {
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .plan-badge {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+
+  .badge-active   { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+  .badge-trial    { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+  .badge-paused   { background: rgba(90,90,114,0.2); color: var(--muted-hi); border: 1px solid var(--border-hi); }
+  .badge-failed   { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+  .badge-inactive { background: rgba(90,90,114,0.2); color: var(--muted); border: 1px solid var(--border); }
+
+  .plan-price {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .plan-price span {
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--muted-hi);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  .plan-desc {
+    color: var(--muted-hi);
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 12px 0 16px;
+  }
+
+  .plan-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .meta-item { color: var(--muted); }
+  .meta-item strong { color: var(--muted-hi); display: block; font-weight: 500; }
+
+  .plan-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(37,99,255,0.3);
+  }
+
+  .btn-primary:hover {
+    background: #3b75ff;
+    box-shadow: 0 0 24px rgba(37,99,255,0.45);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted-hi);
+    border: 1px solid var(--border-hi);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--blue-dim);
+    color: var(--text);
+  }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid rgba(239,68,68,0.3);
+  }
+
+  .btn-danger:hover {
+    background: rgba(239,68,68,0.08);
+  }
+
+  .btn-sm {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+
+  /* ── Form ── */
+  .form-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-title {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.cols-1 { grid-template-columns: 1fr; }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.span-2 { grid-column: span 2; }
+  .field.span-3 { grid-column: span 3; }
+
+  label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input, textarea, select {
+    background: var(--bg);
+    border: 1px solid var(--border-hi);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--blue-dim);
+    box-shadow: 0 0 0 2px var(--blue-glow);
+  }
+
+  textarea { resize: vertical; min-height: 72px; }
+
+  select option { background: var(--surface); }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  /* ── Subscriptions table ── */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: rgba(0,0,0,0.3);
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(37,99,255,0.04); }
+
+  td {
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--muted-hi);
+  }
+
+  td.id    { color: var(--muted); font-size: 11px; }
+  td.mono  { font-family: var(--mono); }
+  td.name  { color: var(--text); font-weight: 500; }
+  td.price { color: var(--blue); font-weight: 600; }
+
+  /* ── Terminal / activity log ── */
+  .log-panel {
+    background: #050508;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .log-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .log-body {
+    padding: 16px;
+    max-height: 280px;
+    overflow-y: auto;
+    font-size: 11px;
+    line-height: 1.8;
+  }
+
+  .log-body::-webkit-scrollbar { width: 4px; }
+  .log-body::-webkit-scrollbar-track { background: transparent; }
+  .log-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+  .log-line { display: flex; gap: 12px; }
+  .log-time { color: var(--muted); min-width: 80px; }
+  .log-event { }
+  .log-ok     { color: var(--green); }
+  .log-warn   { color: var(--amber); }
+  .log-err    { color: var(--red); }
+  .log-info   { color: var(--blue); }
+
+  /* ── Tx submit area ── */
+  .tx-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  /* ── Toast ── */
+  .toast-area {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border-hi);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.25s ease;
+    pointer-events: all;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .toast.ok   { border-left: 3px solid var(--green); }
+  .toast.err  { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--blue); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .page { padding: 24px 16px 64px; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .field.span-2 { grid-column: span 1; }
+    .tx-grid { grid-template-columns: 1fr; }
+    header { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="15" fill="black"/>
+        <!-- Circular arrow path -->
+        <path d="M 16 4 A 12 12 0 1 1 6 22" stroke="white" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <!-- Arrowhead at end of arc -->
+        <polyline points="3,18 6,22 10,20" stroke="#2563ff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Center dot -->
+        <circle cx="16" cy="16" r="2.5" fill="white"/>
+      </svg>
+    </div>
+    <span class="logo-name">Subex</span>
+    <span class="logo-ticker">$SBX</span>
+  </div>
+  <div class="header-status">
+    <div class="dot"></div>
+    <span>BETANET · BLOCK #<span id="live-height">—</span></span>
+  </div>
+</header>
+
+<!-- ── Page ── -->
+<div class="page">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-label">// programmable subscription infrastructure</div>
+    <h1 class="hero-title">Recurring payments.<br><span>On-chain.</span></h1>
+    <p class="hero-sub">Create subscription tiers, automate billing, enforce cancellations — without intermediaries. Payments validated by the network. Revenue goes directly to creators.</p>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat">
+      <div class="stat-label">Total Plans</div>
+      <div class="stat-value blue" id="stat-plans">0</div>
+      <div class="stat-delta">↑ on-chain</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Active Subscriptions</div>
+      <div class="stat-value green" id="stat-subs">0</div>
+      <div class="stat-delta">↑ live</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Billed</div>
+      <div class="stat-value" id="stat-billed">0 SBX</div>
+      <div class="stat-delta">cumulative</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Billing Reward</div>
+      <div class="stat-value blue">1 SBX</div>
+      <div class="stat-delta">per processed cycle</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="setTab('plans')">Plans</div>
+    <div class="tab" onclick="setTab('subscriptions')">Subscriptions</div>
+    <div class="tab" onclick="setTab('submit')">Submit Tx</div>
+    <div class="tab" onclick="setTab('log')">Activity Log</div>
+  </div>
+
+  <!-- ── Tab: Plans ── -->
+  <div class="tab-content active" id="tab-plans">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div class="section-header" style="margin:0;">
+        <span class="section-title">Subscription Plans</span>
+        <span class="section-count" id="plans-count">0 ACTIVE</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="toggleCreateForm()">+ Create Plan</button>
+    </div>
+
+    <!-- Create plan form (hidden by default) -->
+    <div class="form-panel" id="create-plan-form" style="display:none;">
+      <div class="form-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1" stroke="#2563ff" stroke-width="1.5"/><path d="M7 4v6M4 7h6" stroke="#2563ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+        New Subscription Plan
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Creator Address</label>
+          <input type="text" id="cp-creator" placeholder="0x..." />
+        </div>
+        <div class="field">
+          <label>Plan Name</label>
+          <input type="text" id="cp-name" placeholder="Pro Monthly" maxlength="64" />
+        </div>
+        <div class="field span-2">
+          <label>Description</label>
+          <textarea id="cp-desc" placeholder="What subscribers get..." maxlength="280"></textarea>
+        </div>
+        <div class="field">
+          <label>Price (uSBX / cycle)</label>
+          <input type="number" id="cp-price" placeholder="1000000" min="1" />
+        </div>
+        <div class="field">
+          <label>Interval (days)</label>
+          <input type="number" id="cp-interval" placeholder="30" min="1" />
+        </div>
+        <div class="field">
+          <label>Trial Period (days, 0 = none)</label>
+          <input type="number" id="cp-trial" placeholder="0" min="0" />
+        </div>
+        <div class="field">
+          <label>Max Subscribers (0 = unlimited)</label>
+          <input type="number" id="cp-maxsubs" placeholder="0" min="0" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="submitCreatePlan()">Deploy Plan →</button>
+        <button class="btn btn-ghost" onclick="toggleCreateForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Plans grid -->
+    <div class="plans-grid" id="plans-grid">
+      <!-- populated by JS -->
+    </div>
+
+    <div id="plans-empty" style="display:none; text-align:center; padding:64px 0; color:var(--muted);">
+      <div style="font-size:32px; margin-bottom:12px;">◎</div>
+      <div>No plans deployed yet.</div>
+      <div style="margin-top:4px; font-size:11px;">Create the first subscription plan on Subex.</div>
+    </div>
+
+  </div>
+
+  <!-- ── Tab: Subscriptions ── -->
+  <div class="tab-content" id="tab-subscriptions">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div class="section-header" style="margin:0;">
+        <span class="section-title">Subscriptions</span>
+        <span class="section-count" id="subs-count">0 RECORDS</span>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#ID</th>
+            <th>Plan</th>
+            <th>Subscriber</th>
+            <th>Status</th>
+            <th>Billing Cycle</th>
+            <th>Next Bill</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="subs-tbody">
+          <tr><td colspan="7" style="text-align:center; padding:32px; color:var(--muted);">No subscriptions yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Tab: Submit Tx ── -->
+  <div class="tab-content" id="tab-submit">
+    <div class="section-header">
+      <span class="section-title">Submit Transaction</span>
+    </div>
+
+    <div class="tx-grid">
+
+      <!-- Subscribe -->
+      <div class="form-panel">
+        <div class="form-title">Subscribe to Plan</div>
+        <div class="form-grid cols-1">
+          <div class="field">
+            <label>Subscriber Address</label>
+            <input type="text" id="sub-addr" placeholder="0x..." />
+          </div>
+          <div class="field">
+            <label>Plan ID</label>
+            <input type="number" id="sub-plan-id" placeholder="1" min="1" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-sm" onclick="submitSubscribe()">Subscribe →</button>
+        </div>
+      </div>
+
+      <!-- Process Billing -->
+      <div class="form-panel">
+        <div class="form-title">Process Billing</div>
+        <div class="form-grid cols-1">
+          <div class="field">
+            <label>Processor Address</label>
+            <input type="text" id="proc-addr" placeholder="0x..." />
+          </div>
+          <div class="field">
+            <label>Subscription ID</label>
+            <input type="number" id="proc-sub-id" placeholder="1" min="1" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-sm" onclick="submitProcessBilling()">Process →</button>
+        </div>
+      </div>
+
+      <!-- Cancel Subscription -->
+      <div class="form-panel">
+        <div class="form-title">Cancel Subscription</div>
+        <div class="form-grid cols-1">
+          <div class="field">
+            <label>Subscriber Address</label>
+            <input type="text" id="cancel-addr" placeholder="0x..." />
+          </div>
+          <div class="field">
+            <label>Subscription ID</label>
+            <input type="number" id="cancel-sub-id" placeholder="1" min="1" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-danger btn-sm" onclick="submitCancel()">Cancel Sub</button>
+        </div>
+      </div>
+
+      <!-- Pause / Resume -->
+      <div class="form-panel">
+        <div class="form-title">Pause / Resume</div>
+        <div class="form-grid cols-1">
+          <div class="field">
+            <label>Subscriber Address</label>
+            <input type="text" id="pause-addr" placeholder="0x..." />
+          </div>
+          <div class="field">
+            <label>Subscription ID</label>
+            <input type="number" id="pause-sub-id" placeholder="1" min="1" />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-ghost btn-sm" onclick="submitPause()">Pause</button>
+          <button class="btn btn-ghost btn-sm" onclick="submitResume()">Resume</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Update Plan -->
+    <div class="form-panel">
+      <div class="form-title">Update Plan</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Creator Address</label>
+          <input type="text" id="upd-creator" placeholder="0x..." />
+        </div>
+        <div class="field">
+          <label>Plan ID</label>
+          <input type="number" id="upd-plan-id" placeholder="1" min="1" />
+        </div>
+        <div class="field">
+          <label>New Name (blank = no change)</label>
+          <input type="text" id="upd-name" placeholder="" />
+        </div>
+        <div class="field">
+          <label>New Price in uSBX (0 = no change)</label>
+          <input type="number" id="upd-price" placeholder="0" min="0" />
+        </div>
+        <div class="field span-2">
+          <label>New Description (blank = no change)</label>
+          <textarea id="upd-desc" placeholder=""></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary btn-sm" onclick="submitUpdatePlan()">Update Plan →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Tab: Activity Log ── -->
+  <div class="tab-content" id="tab-log">
+    <div class="section-header">
+      <span class="section-title">Activity Log</span>
+    </div>
+    <div class="log-panel">
+      <div class="log-header">
+        <div class="dot"></div>
+        LIVE · RPC http://localhost:50002
+      </div>
+      <div class="log-body" id="log-body">
+        <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">Subex node initialized. Waiting for connection...</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Toast area -->
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// SUBEX FRONTEND — CANOPY BUILDER GUIDE COMPLIANT
+// Key rules from the guide:
+//  • All RPC endpoints use POST (GET returns 405)
+//  • TX endpoint is /v1/tx (singular — /v1/txs returns 405)
+//  • Core types (send) use one body format; plugin types use msgTypeUrl + msgBytes
+//  • Signature fields are HEX strings (not base64)
+//  • Addresses are SHA256(pubKey).slice(0,20) — NOT the raw pubkey
+//  • txTime computed ONCE — reused in both sign bytes and tx body
+//  • Empty memo is OMITTED from sign bytes (proto3 omits empty strings)
+// ════════════════════════════════════════════════════════════════════════════
+
+const RPC        = 'http://localhost:50002';
+const ARPC       = 'http://localhost:50003';
+const NETWORK_ID = 1;
+const CHAIN_ID   = 1;
+
+// ── Type URLs — must exactly match ContractConfig.TransactionTypeUrls order ─
+const TYPE_URLS = {
+  'send':                'type.googleapis.com/types.MessageSend',
+  'create_plan':         'type.googleapis.com/types.MessageCreatePlan',
+  'subscribe':           'type.googleapis.com/types.MessageSubscribe',
+  'process_billing':     'type.googleapis.com/types.MessageProcessBilling',
+  'cancel_subscription': 'type.googleapis.com/types.MessageCancelSubscription',
+  'pause_subscription':  'type.googleapis.com/types.MessagePauseSubscription',
+  'resume_subscription': 'type.googleapis.com/types.MessageResumeSubscription',
+  'update_plan':         'type.googleapis.com/types.MessageUpdatePlan',
+};
+
+// ── Minimal Protobuf Encoder (no library needed) ──────────────────────────
+// From the Canopy Builder Guide — hand-roll protobuf encoding in the browser.
+function encodeVarint(val) {
+  const bytes = [];
+  let v = typeof val === 'bigint' ? val : BigInt(val);
+  do {
+    let b = Number(v & 0x7fn);
+    v >>= 7n;
+    if (v > 0n) b |= 0x80;
+    bytes.push(b);
+  } while (v > 0n);
+  return new Uint8Array(bytes);
+}
+function encodeTag(field, wire) { return encodeVarint((field << 3) | wire); }
+function protoEncode(fields) {
+  const parts = [];
+  for (const f of fields) {
+    if (f.value === undefined || f.value === null) continue;
+    if (f.type === 'string') {
+      if (f.value === '') continue; // proto3: omit empty strings
+      const enc = new TextEncoder().encode(f.value);
+      parts.push(encodeTag(f.field, 2), encodeVarint(enc.length), enc);
+    } else if (f.type === 'bytes') {
+      if (!f.value?.length) continue;
+      parts.push(encodeTag(f.field, 2), encodeVarint(f.value.length), f.value);
+    } else if (f.type === 'varint') {
+      if (f.value === 0 || f.value === 0n) continue; // proto3: omit zero values
+      parts.push(encodeTag(f.field, 0), encodeVarint(f.value));
+    }
+  }
+  const out = new Uint8Array(parts.reduce((s, p) => s + p.length, 0));
+  let off = 0;
+  for (const p of parts) { out.set(p, off); off += p.length; }
+  return out;
+}
+
+// Encode google.protobuf.Any { typeUrl, value }
+function encodeAny(typeUrl, valueBytes) {
+  return protoEncode([
+    { field: 1, type: 'string', value: typeUrl },
+    { field: 2, type: 'bytes',  value: valueBytes },
+  ]);
+}
+
+// Build Transaction sign bytes — signature field (3) MUST be omitted entirely.
+// memo field (7) MUST be omitted when empty (proto3 omits empty strings — emitting
+// it would produce bytes the node doesn't include, causing signature mismatch).
+function buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time, memo, networkID, chainID }) {
+  const txTime = typeof time === 'bigint' ? time : BigInt(time);
+  const anyBytes = encodeAny(msgTypeUrl, msgBytes);
+  const fields = [
+    { field: 1, type: 'string', value: type },      // message_type
+    { field: 2, type: 'bytes',  value: anyBytes },   // msg (Any)
+    // field 3 = signature — MUST be omitted
+    // field 4 = created_height — omit if 0
+    { field: 5, type: 'varint', value: txTime },     // time (microseconds)
+    { field: 6, type: 'varint', value: fee },        // fee
+    // field 7 = memo — only when non-empty
+    { field: 8, type: 'varint', value: networkID || 1 },
+    { field: 9, type: 'varint', value: chainID  || 1 },
+  ];
+  if (memo) fields.push({ field: 7, type: 'string', value: memo });
+  return protoEncode(fields);
+}
+
+// ── BLS12-381 Signing ─────────────────────────────────────────────────────
+// Loaded lazily from esm.sh — works on mobile (Termux/Userland browser).
+let _bls;
+async function loadBLS() {
+  if (_bls) return _bls;
+  const mod = await import('https://esm.sh/@noble/curves@1.4.2/bls12-381');
+  _bls = mod.bls12_381;
+  return _bls;
+}
+
+// Derive Canopy address from BLS public key bytes
+// Address = SHA256(pubKeyBytes).slice(0, 20)
+async function pubKeyToAddress(pubKeyBytes) {
+  const hash = await crypto.subtle.digest('SHA-256', pubKeyBytes);
+  return new Uint8Array(hash).slice(0, 20);
+}
+
+// ── Build + Sign Complete TX ──────────────────────────────────────────────
+// CRITICAL: txTime computed ONCE here and reused in both sign bytes and tx body.
+// Two calls to Date.now() = different values = signature mismatch every time.
+async function buildTx(type, msgTypeUrl, msgBytes, wallet, fee = 10000, memo = '') {
+  const bls = await loadBLS();
+  const txTime = BigInt(Date.now() * 1000); // microseconds — computed ONCE
+  const signBytes = buildSignBytes({
+    type, msgTypeUrl, msgBytes, fee,
+    time: txTime, // reuse
+    memo: memo || '',
+    networkID: NETWORK_ID,
+    chainID: CHAIN_ID,
+  });
+  const sigBytes = await bls.sign(signBytes, wallet.privKey); // G2, 96 bytes
+  // Signature fields are HEX (not base64) — checklist item
+  return {
+    type,
+    msgTypeUrl,
+    msgBytes:  bytesToHex(msgBytes),   // hex-encoded protobuf bytes of the inner message
+    fee,
+    time:      Number(txTime),         // same value — not a new Date.now() call
+    memo:      memo || '',
+    networkID: NETWORK_ID,
+    chainID:   CHAIN_ID,
+    signature: {
+      publicKey: bytesToHex(wallet.pubKey), // hex, 48 bytes
+      signature: bytesToHex(sigBytes),      // hex, 96 bytes
+    },
+  };
+}
+
+// ── Protobuf Encoders for Each Subex Message Type ─────────────────────────
+// These produce the msgBytes field for the plugin tx body format.
+
+function encodeMsgCreatePlan(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.creatorAddress },
+    { field: 2, type: 'string', value: msg.name },
+    { field: 3, type: 'string', value: msg.description || '' },
+    { field: 4, type: 'varint', value: msg.price },
+    { field: 5, type: 'varint', value: msg.intervalDays },
+    { field: 6, type: 'varint', value: msg.trialDays || 0 },
+    { field: 7, type: 'varint', value: msg.maxSubscribers || 0 },
+  ]);
+}
+function encodeMsgSubscribe(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
+    { field: 2, type: 'varint', value: msg.planId },
+  ]);
+}
+function encodeMsgProcessBilling(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.processorAddress },
+    { field: 2, type: 'varint', value: msg.subscriptionId },
+  ]);
+}
+function encodeMsgCancelSubscription(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
+    { field: 2, type: 'varint', value: msg.subscriptionId },
+  ]);
+}
+function encodeMsgPauseSubscription(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
+    { field: 2, type: 'varint', value: msg.subscriptionId },
+  ]);
+}
+function encodeMsgResumeSubscription(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
+    { field: 2, type: 'varint', value: msg.subscriptionId },
+  ]);
+}
+function encodeMsgUpdatePlan(msg) {
+  return protoEncode([
+    { field: 1, type: 'bytes',  value: msg.creatorAddress },
+    { field: 2, type: 'varint', value: msg.planId },
+    { field: 3, type: 'string', value: msg.name || '' },
+    { field: 4, type: 'string', value: msg.description || '' },
+    { field: 5, type: 'varint', value: msg.newPrice || 0 },
+    { field: 6, type: 'varint', value: msg.maxSubscribers || 0 },
+  ]);
+}
+
+// ── Byte Helpers ─────────────────────────────────────────────────────────
+function hexToBytes(hex) {
+  const clean = hex.replace(/^0x/, '');
+  const bytes = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(clean.slice(i*2, i*2+2), 16);
+  return bytes;
+}
+function bytesToHex(b) {
+  return Array.from(b).map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function bytesToBase64(b) {
+  let s = '';
+  for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+  return btoa(s);
+}
+
+// ── RPC Helpers ───────────────────────────────────────────────────────────
+// All Canopy endpoints use POST. GET returns 405.
+async function postRPC(url, body = {}) {
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const text = await r.text();
+    if (r.status >= 400) throw new Error(`HTTP ${r.status}: ${text}`);
+    return JSON.parse(text);
+  } catch(e) {
+    return { error: e.message };
+  }
+}
+
+async function getHeight() {
+  const r = await postRPC(`${RPC}/v1/query/height`, {});
+  return r.height || 0;
+}
+async function getAccountBalance(address) {
+  const r = await postRPC(`${RPC}/v1/query/account`, { address });
+  return r.amount || 0;
+}
+async function keystoreNewKey(nickname, password) {
+  return postRPC(`${ARPC}/v1/admin/keystore-new-key`, { nickname, password });
+}
+async function keystoreGetKey(address, password) {
+  const r = await postRPC(`${ARPC}/v1/admin/keystore-get`, { address, password });
+  return {
+    address:    r.address    || r.Address,
+    publicKey:  r.publicKey  || r.PublicKey  || r.public_key,
+    privateKey: r.privateKey || r.PrivateKey || r.private_key,
+  };
+}
+async function waitForTxInclusion(senderAddr, timeoutMs = 60000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const r = await postRPC(`${RPC}/v1/query/txs-by-sender`, { address: senderAddr, perPage: 5 });
+    if (!r.error && r.results?.length) return true;
+    await new Promise(res => setTimeout(res, 1200));
+  }
+  return false;
+}
+// Submit — endpoint is /v1/tx (singular — /v1/txs returns 405)
+async function submitTx(txBody) {
+  return postRPC(`${RPC}/v1/tx`, txBody);
+}
+
+// ── Wallet State (loaded from keystore for live mode) ─────────────────────
+let wallet = null; // { address, pubKey: Uint8Array, privKey: Uint8Array }
+
+async function loadWallet(addressHex, password = '') {
+  const k = await keystoreGetKey(addressHex, password);
+  if (k.error) { toast('err', 'Keystore error: ' + k.error); return false; }
+  const pubKeyBytes  = hexToBytes(k.publicKey);
+  const privKeyBytes = hexToBytes(k.privateKey);
+  wallet = {
+    address: k.address,
+    pubKey:  pubKeyBytes,
+    privKey: privKeyBytes,
+  };
+  log('ok', `Wallet loaded: ${k.address}`);
+  toast('ok', 'Wallet loaded.');
+  return true;
+}
+
+// ── App State ─────────────────────────────────────────────────────────────
+let plans = [];
+let subs  = [];
+let blockHeight = 0;
+
+// DEMO_MODE = true  → mock data, no node required
+// DEMO_MODE = false → live node at localhost:50002/50003 required
+const DEMO_MODE = true;
+
+const mockPlans = [
+  { id: 1, name: "Creator Pro",  description: "Unlimited content access, early releases, and direct creator chat.", price: 5000000,  intervalDays: 30, trialDays: 7,  maxSubscribers: 0,   activeSubs: 142, active: true, createdHeight: 1201 },
+  { id: 2, name: "Dev Access",   description: "Full API access, priority support, and SDK downloads for developers.", price: 15000000, intervalDays: 30, trialDays: 0,  maxSubscribers: 500, activeSubs: 87,  active: true, createdHeight: 1450 },
+  { id: 3, name: "Community",    description: "Membership with voting rights and exclusive Discord access.", price: 1000000,  intervalDays: 30, trialDays: 14, maxSubscribers: 0,   activeSubs: 931, active: true, createdHeight: 1550 },
+];
+const mockSubs = [
+  { id: 1, planId: 1, planName: "Creator Pro", subscriberAddress: "a1b2c3d4e5f6a1b2c3d4", status: "active",    billingCycle: 3, nextBillingHeight: 11800 },
+  { id: 2, planId: 3, planName: "Community",   subscriberAddress: "f6e5d4c3b2a1f6e5d4c3", status: "trial",     billingCycle: 0, nextBillingHeight: 5000  },
+  { id: 3, planId: 2, planName: "Dev Access",  subscriberAddress: "1a2b3c4d5e6f1a2b3c4d", status: "paused",    billingCycle: 1, nextBillingHeight: 12400 },
+  { id: 4, planId: 1, planName: "Creator Pro", subscriberAddress: "dead4eef42dead4eef42", status: "failed",    billingCycle: 2, nextBillingHeight: 10000 },
+];
+
+// ── Init ──────────────────────────────────────────────────────────────────
+function init() {
+  if (DEMO_MODE) {
+    plans = mockPlans; subs = mockSubs; blockHeight = 10342;
+    document.getElementById('live-height').textContent = blockHeight.toLocaleString();
+    renderAll();
+    log('info', 'Demo mode. Set DEMO_MODE=false and connect node at localhost:50002 to go live.');
+    log('ok', 'Subex plugin loaded. 3 plans active.');
+  } else {
+    pollHeight();
+  }
+  setInterval(() => {
+    if (!DEMO_MODE) { pollHeight(); }
+    else { blockHeight += Math.floor(Math.random()*3)+1; document.getElementById('live-height').textContent = blockHeight.toLocaleString(); }
+  }, 6000);
+}
+async function pollHeight() {
+  const h = await getHeight();
+  if (h) { blockHeight = h; document.getElementById('live-height').textContent = blockHeight.toLocaleString(); }
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────
+function renderAll() { renderStats(); renderPlans(); renderSubs(); }
+
+function renderStats() {
+  document.getElementById('stat-plans').textContent = plans.filter(p => p.active).length;
+  document.getElementById('stat-subs').textContent  = subs.filter(s => s.status==='active'||s.status==='trial').length;
+  const billed = subs.reduce((a,s) => a+s.billingCycle, 0);
+  document.getElementById('stat-billed').textContent = (billed*5).toFixed(0)+' SBX';
+  document.getElementById('plans-count').textContent = plans.filter(p=>p.active).length+' ACTIVE';
+  document.getElementById('subs-count').textContent  = subs.length+' RECORDS';
+}
+
+function renderPlans() {
+  const grid = document.getElementById('plans-grid');
+  const empty = document.getElementById('plans-empty');
+  if (!plans.length) { grid.style.display='none'; empty.style.display='block'; return; }
+  grid.style.display='grid'; empty.style.display='none';
+  grid.innerHTML = plans.map(p => `
+    <div class="plan-card ${p.active?'active-plan':''}">
+      <div class="plan-header">
+        <div class="plan-name">${esc(p.name)}</div>
+        <span class="plan-badge ${p.active?'badge-active':'badge-inactive'}">${p.active?'active':'inactive'}</span>
+      </div>
+      <div class="plan-price">${fmtSBX(p.price)}<span> SBX / ${p.intervalDays}d</span></div>
+      <div class="plan-desc">${esc(p.description)}</div>
+      <div class="plan-meta">
+        <div class="meta-item"><strong>${p.activeSubs}</strong>subscribers</div>
+        <div class="meta-item"><strong>${p.maxSubscribers>0?p.maxSubscribers:'∞'}</strong>cap</div>
+        <div class="meta-item"><strong>${p.trialDays>0?p.trialDays+'d':'none'}</strong>trial</div>
+        <div class="meta-item"><strong>#${p.id}</strong>plan id</div>
+      </div>
+      <div class="plan-actions">
+        <button class="btn btn-primary btn-sm" onclick="quickSubscribe(${p.id})">Subscribe</button>
+        <button class="btn btn-ghost btn-sm" onclick="prefillUpdate(${p.id})">Edit</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderSubs() {
+  const tbody = document.getElementById('subs-tbody');
+  if (!subs.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">No subscriptions yet.</td></tr>'; return; }
+  tbody.innerHTML = subs.map(s => `
+    <tr>
+      <td class="id">#${s.id}</td>
+      <td class="name">${esc(s.planName||'Plan #'+s.planId)}</td>
+      <td class="mono" style="font-size:10px;">${s.subscriberAddress.slice(0,10)}…</td>
+      <td><span class="plan-badge badge-${s.status}">${s.status}</span></td>
+      <td>${s.billingCycle}</td>
+      <td class="mono" style="font-size:11px;">#${s.nextBillingHeight}</td>
+      <td><div style="display:flex;gap:6px;">
+        ${s.status==='active'||s.status==='trial'?`<button class="btn btn-ghost btn-sm" onclick="quickPause(${s.id})">Pause</button>`:''}
+        ${s.status==='paused'?`<button class="btn btn-ghost btn-sm" onclick="quickResume(${s.id})">Resume</button>`:''}
+        ${s.status!=='cancelled'?`<button class="btn btn-danger btn-sm" onclick="quickCancel(${s.id})">Cancel</button>`:''}
+        ${(s.status==='active'||s.status==='trial')&&blockHeight>=s.nextBillingHeight?`<button class="btn btn-primary btn-sm" onclick="quickBill(${s.id})">Bill</button>`:''}
+      </div></td>
+    </tr>`).join('');
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────
+function setTab(name) {
+  const names = ['plans','subscriptions','submit','log'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
+  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── Form Helpers ──────────────────────────────────────────────────────────
+function toggleCreateForm() {
+  const f = document.getElementById('create-plan-form');
+  f.style.display = f.style.display==='none' ? 'block' : 'none';
+}
+
+// ── Submit Handlers ───────────────────────────────────────────────────────
+// Each handler:
+//  DEMO_MODE → mutate local state, log action
+//  LIVE mode → encode msgBytes with protoEncode, call buildTx (signs with BLS),
+//              submit to /v1/tx using the plugin type body format:
+//              { type, msgTypeUrl, msgBytes (hex), fee, time, networkID, chainID, signature }
+
+async function submitCreatePlan() {
+  const creatorHex = document.getElementById('cp-creator').value.trim();
+  const name       = document.getElementById('cp-name').value.trim();
+  const desc       = document.getElementById('cp-desc').value.trim();
+  const price      = parseInt(document.getElementById('cp-price').value)    || 0;
+  const interval   = parseInt(document.getElementById('cp-interval').value) || 0;
+  const trial      = parseInt(document.getElementById('cp-trial').value)    || 0;
+  const maxSubs    = parseInt(document.getElementById('cp-maxsubs').value)  || 0;
+
+  if (!creatorHex || !name || !price || !interval) { toast('err', 'Creator address, name, price, and interval are required.'); return; }
+
+  if (DEMO_MODE) {
+    plans.push({ id: plans.length+1, name, description: desc, price, intervalDays: interval,
+      trialDays: trial, maxSubscribers: maxSubs, activeSubs: 0, active: true, createdHeight: blockHeight });
+    renderAll(); log('ok', `create_plan → "${name}" · ${fmtSBX(price)} SBX / ${interval}d`);
+    toast('ok', `Plan "${name}" deployed.`); toggleCreateForm(); return;
+  }
+
+  if (!wallet) { toast('err', 'Load wallet first (keystore → loadWallet).'); return; }
+  const creatorAddr = await pubKeyToAddress(wallet.pubKey); // SHA256(pubKey).slice(0,20)
+  const msgBytes = encodeMsgCreatePlan({
+    creatorAddress: creatorAddr, name, description: desc,
+    price, intervalDays: interval, trialDays: trial, maxSubscribers: maxSubs,
+  });
+  const txBody = await buildTx('create_plan', TYPE_URLS['create_plan'], msgBytes, wallet, 50000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); log('err', `create_plan failed: ${r.error}`); return; }
+  toast('ok', `Plan submitted.`); log('ok', `create_plan submitted`); toggleCreateForm();
+}
+
+async function submitSubscribe() {
+  const addrHex = document.getElementById('sub-addr').value.trim();
+  const planId  = parseInt(document.getElementById('sub-plan-id').value) || 0;
+  if (!addrHex || !planId) { toast('err', 'Subscriber address and plan ID required.'); return; }
+  if (DEMO_MODE) { log('info', `subscribe → planId=${planId}`); toast('info', 'subscribe (demo)'); return; }
+  if (!wallet) { toast('err', 'Load wallet first.'); return; }
+  const subAddr  = await pubKeyToAddress(wallet.pubKey);
+  const msgBytes = encodeMsgSubscribe({ subscriberAddress: subAddr, planId });
+  const txBody   = await buildTx('subscribe', TYPE_URLS['subscribe'], msgBytes, wallet, 10000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); return; }
+  toast('ok', 'Subscribe submitted.'); log('ok', `subscribe planId=${planId}`);
+}
+
+async function submitProcessBilling() {
+  const procHex = document.getElementById('proc-addr').value.trim();
+  const subId   = parseInt(document.getElementById('proc-sub-id').value) || 0;
+  if (!procHex || !subId) { toast('err', 'Processor address and subscription ID required.'); return; }
+  if (DEMO_MODE) { log('info', `process_billing → subId=${subId}`); toast('info', 'process_billing (demo)'); return; }
+  if (!wallet) { toast('err', 'Load wallet first.'); return; }
+  const procAddr = await pubKeyToAddress(wallet.pubKey);
+  const msgBytes = encodeMsgProcessBilling({ processorAddress: procAddr, subscriptionId: subId });
+  const txBody   = await buildTx('process_billing', TYPE_URLS['process_billing'], msgBytes, wallet, 5000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); return; }
+  toast('ok', 'Billing processed.'); log('ok', `process_billing subId=${subId}`);
+}
+
+async function submitCancel() {
+  const addrHex = document.getElementById('cancel-addr').value.trim();
+  const subId   = parseInt(document.getElementById('cancel-sub-id').value) || 0;
+  if (!addrHex || !subId) { toast('err', 'Subscriber address and subscription ID required.'); return; }
+  if (DEMO_MODE) { quickCancel(subId); return; }
+  if (!wallet) { toast('err', 'Load wallet first.'); return; }
+  const subAddr  = await pubKeyToAddress(wallet.pubKey);
+  const msgBytes = encodeMsgCancelSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
+  const txBody   = await buildTx('cancel_subscription', TYPE_URLS['cancel_subscription'], msgBytes, wallet, 10000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); return; }
+  toast('ok', 'Cancellation submitted.'); log('warn', `cancel_subscription subId=${subId}`);
+}
+
+async function submitPause() {
+  const addrHex = document.getElementById('pause-addr').value.trim();
+  const subId   = parseInt(document.getElementById('pause-sub-id').value) || 0;
+  if (!addrHex || !subId) { toast('err', 'Address and subscription ID required.'); return; }
+  if (DEMO_MODE) { quickPause(subId); return; }
+  if (!wallet) { toast('err', 'Load wallet first.'); return; }
+  const subAddr  = await pubKeyToAddress(wallet.pubKey);
+  const msgBytes = encodeMsgPauseSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
+  const txBody   = await buildTx('pause_subscription', TYPE_URLS['pause_subscription'], msgBytes, wallet, 10000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); return; }
+  toast('ok', 'Pause submitted.'); log('ok', `pause_subscription subId=${subId}`);
+}
+
+async function submitResume() {
+  const addrHex = document.getElementById('pause-addr').value.trim();
+  const subId   = parseInt(document.getElementById('pause-sub-id').value) || 0;
+  if (!addrHex || !subId) { toast('err', 'Address and subscription ID required.'); return; }
+  if (DEMO_MODE) { quickResume(subId); return; }
+  if (!wallet) { toast('err', 'Load wallet first.'); return; }
+  const subAddr  = await pubKeyToAddress(wallet.pubKey);
+  const msgBytes = encodeMsgResumeSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
+  const txBody   = await buildTx('resume_subscription', TYPE_URLS['resume_subscription'], msgBytes, wallet, 10000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); return; }
+  toast('ok', 'Resume submitted.'); log('ok', `resume_subscription subId=${subId}`);
+}
+
+async function submitUpdatePlan() {
+  const creatorHex = document.getElementById('upd-creator').value.trim();
+  const planId     = parseInt(document.getElementById('upd-plan-id').value)  || 0;
+  const name       = document.getElementById('upd-name').value.trim();
+  const price      = parseInt(document.getElementById('upd-price').value)    || 0;
+  const desc       = document.getElementById('upd-desc').value.trim();
+  if (!creatorHex || !planId) { toast('err', 'Creator address and plan ID required.'); return; }
+
+  if (DEMO_MODE) {
+    const p = plans.find(p => p.id===planId);
+    if (!p) { toast('err', 'Plan not found.'); return; }
+    if (name) p.name=name; if (price) p.price=price; if (desc) p.description=desc;
+    renderAll(); log('ok', `update_plan #${planId}`); toast('ok', `Plan #${planId} updated.`); return;
+  }
+
+  if (!wallet) { toast('err', 'Load wallet first.'); return; }
+  const creatorAddr = await pubKeyToAddress(wallet.pubKey);
+  const msgBytes = encodeMsgUpdatePlan({ creatorAddress: creatorAddr, planId, name, newPrice: price, description: desc });
+  const txBody   = await buildTx('update_plan', TYPE_URLS['update_plan'], msgBytes, wallet, 20000);
+  const r = await submitTx(txBody);
+  if (r.error) { toast('err', r.error); return; }
+  toast('ok', `Plan #${planId} updated.`); log('ok', `update_plan #${planId}`);
+}
+
+// ── Quick Table Actions ───────────────────────────────────────────────────
+function quickSubscribe(planId) { document.getElementById('sub-plan-id').value=planId; setTab('submit'); toast('info', `Fill in subscriber address for plan #${planId}.`); }
+function quickPause(subId)  { if(!DEMO_MODE)return; const s=subs.find(s=>s.id===subId); if(s){s.status='paused';renderAll();log('ok',`pause_subscription #${subId}`);toast('ok',`Sub #${subId} paused.`);} }
+function quickResume(subId) { if(!DEMO_MODE)return; const s=subs.find(s=>s.id===subId); if(s){s.status='active';s.nextBillingHeight=blockHeight+108000;renderAll();log('ok',`resume_subscription #${subId}`);toast('ok',`Sub #${subId} resumed.`);} }
+function quickCancel(subId) {
+  if(!DEMO_MODE)return;
+  const s=subs.find(s=>s.id===subId);
+  if(s){ s.status='cancelled'; const p=plans.find(p=>p.id===s.planId); if(p&&p.activeSubs>0)p.activeSubs--; renderAll(); log('warn',`cancel_subscription #${subId}`); toast('ok',`Sub #${subId} cancelled.`); }
+}
+function quickBill(subId)  { if(!DEMO_MODE)return; const s=subs.find(s=>s.id===subId); if(s){s.billingCycle++;s.nextBillingHeight=blockHeight+108000;renderAll();log('ok',`process_billing #${subId} · cycle ${s.billingCycle} · +1 SBX reward`);toast('ok',`Billing processed for sub #${subId}.`);} }
+function prefillUpdate(planId) { const p=plans.find(pl=>pl.id===planId); if(!p)return; document.getElementById('upd-plan-id').value=planId; document.getElementById('upd-name').value=p.name; document.getElementById('upd-desc').value=p.description; document.getElementById('upd-price').value=0; setTab('submit'); }
+
+// ── Utilities ─────────────────────────────────────────────────────────────
+function fmtSBX(uSBX) { return (uSBX/1_000_000).toFixed(uSBX%1_000_000===0?0:2); }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function log(type, msg) {
+  const body=document.getElementById('log-body');
+  const now=new Date().toTimeString().slice(0,8);
+  const line=document.createElement('div');
+  line.className='log-line';
+  line.innerHTML=`<span class="log-time">${now}</span><span class="log-${type}">${esc(msg)}</span>`;
+  body.appendChild(line); body.scrollTop=body.scrollHeight;
+}
+function toast(type, msg) {
+  const area=document.getElementById('toast-area');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`; t.textContent=msg; area.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3500);
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
