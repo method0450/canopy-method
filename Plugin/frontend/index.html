@@ -26,7 +26,6 @@
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -39,18 +38,11 @@
     overflow-x: hidden;
   }
 
-  /* ── Scan-line texture ── */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.06) 2px,
-      rgba(0,0,0,0.06) 4px
-    );
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
     pointer-events: none;
     z-index: 9999;
   }
@@ -60,7 +52,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10,10,12,0.92);
+    background: rgba(10,10,12,0.94);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -70,594 +62,200 @@
     height: 56px;
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .logo-mark {
-    width: 32px;
-    height: 32px;
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .logo-mark svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .logo-name {
-    font-family: var(--sans);
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.02em;
-    color: var(--text);
-  }
-
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark { width: 32px; height: 32px; flex-shrink: 0; }
+  .logo-mark svg { width: 100%; height: 100%; }
+  .logo-name { font-family: var(--sans); font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
   .logo-ticker {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--blue);
-    letter-spacing: 0.12em;
-    border: 1px solid var(--blue-dim);
-    padding: 2px 6px;
-    border-radius: 2px;
+    font-size: 10px; color: var(--blue); letter-spacing: 0.12em;
+    border: 1px solid var(--blue-dim); padding: 2px 6px; border-radius: 2px;
     background: var(--blue-glow);
   }
 
-  .header-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--muted-hi);
-  }
+  .header-right { display: flex; align-items: center; gap: 20px; }
 
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-    animation: pulse 2s ease-in-out infinite;
+  .wallet-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border-hi);
+    border-radius: 3px; padding: 6px 12px; font-size: 11px; color: var(--muted-hi);
+    transition: border-color 0.2s;
   }
+  .wallet-pill.loaded { border-color: rgba(34,197,94,0.3); color: var(--green); }
+  .wallet-pill .w-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted); transition: background 0.2s;
+  }
+  .wallet-pill.loaded .w-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
-  }
+  .header-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted-hi); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
+  .dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
   /* ── Layout ── */
-  .page {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 32px 32px 80px;
-  }
+  .page { max-width: 1280px; margin: 0 auto; padding: 32px 32px 80px; }
 
   /* ── Hero ── */
-  .hero {
-    padding: 64px 0 48px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 48px;
-    position: relative;
-  }
+  .hero { padding: 64px 0 48px; border-bottom: 1px solid var(--border); margin-bottom: 48px; position: relative; }
+  .hero::after { content:''; position:absolute; bottom:-1px; left:0; width:240px; height:1px; background:var(--blue); box-shadow:0 0 12px var(--blue); }
+  .hero-label { font-size: 10px; letter-spacing: 0.18em; color: var(--blue); text-transform: uppercase; margin-bottom: 16px; }
+  .hero-title { font-family: var(--sans); font-size: clamp(36px, 5vw, 64px); font-weight: 800; line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 20px; max-width: 720px; }
+  .hero-title span { color: var(--blue); }
+  .hero-sub { color: var(--muted-hi); max-width: 520px; line-height: 1.7; font-size: 13px; }
 
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 240px;
-    height: 1px;
-    background: var(--blue);
-    box-shadow: 0 0 12px var(--blue);
+  /* ── Node banner ── */
+  .node-banner {
+    display: none;
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 4px; padding: 12px 20px; margin-bottom: 24px;
+    font-size: 12px; color: var(--red); align-items: center; gap: 10px;
   }
-
-  .hero-label {
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    color: var(--blue);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  .hero-title {
-    font-family: var(--sans);
-    font-size: clamp(36px, 5vw, 64px);
-    font-weight: 800;
-    line-height: 1.0;
-    letter-spacing: -0.03em;
-    color: var(--text);
-    margin-bottom: 20px;
-    max-width: 720px;
-  }
-
-  .hero-title span {
-    color: var(--blue);
-  }
-
-  .hero-sub {
-    color: var(--muted-hi);
-    max-width: 520px;
-    line-height: 1.7;
-    font-size: 13px;
-  }
+  .node-banner.show { display: flex; }
 
   /* ── Stats bar ── */
   .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
     margin-bottom: 48px;
-    border-radius: 4px;
-    overflow: hidden;
   }
-
-  .stat {
-    background: var(--surface);
-    padding: 20px 24px;
-    position: relative;
-    transition: background 0.2s;
-  }
-
+  .stat { background: var(--surface); padding: 20px 24px; transition: background 0.2s; }
   .stat:hover { background: #141420; }
-
-  .stat-label {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .stat-value {
-    font-family: var(--sans);
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
-
+  .stat-label { font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-family: var(--sans); font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
   .stat-value.blue  { color: var(--blue); }
   .stat-value.green { color: var(--green); }
-
-  .stat-delta {
-    font-size: 10px;
-    color: var(--green);
-    margin-top: 4px;
-  }
-
-  /* ── Section headers ── */
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .section-title {
-    font-family: var(--sans);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.01em;
-  }
-
-  .section-count {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
+  .stat-delta { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .stat-delta.live { color: var(--green); }
 
   /* ── Tabs ── */
-  .tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 32px;
-  }
-
-  .tab {
-    padding: 10px 20px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.15s, border-color 0.15s;
-    text-transform: uppercase;
-  }
-
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .tab { padding: 10px 20px; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; text-transform: uppercase; }
   .tab:hover { color: var(--text); }
-  .tab.active {
-    color: var(--blue);
-    border-bottom-color: var(--blue);
-  }
-
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
   /* ── Plans grid ── */
-  .plans-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-    margin-bottom: 48px;
-  }
-
+  .plans-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 48px; }
   .plan-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 24px;
-    cursor: pointer;
-    transition: border-color 0.2s, transform 0.15s;
-    position: relative;
-    overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 24px; cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+    position: relative; overflow: hidden;
   }
+  .plan-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:2px; background:var(--blue); transform:scaleX(0); transition:transform 0.2s; transform-origin:left; }
+  .plan-card:hover { border-color: var(--blue-dim); transform: translateY(-1px); }
+  .plan-card:hover::before, .plan-card.active-plan::before { transform: scaleX(1); }
+  .plan-card.active-plan { border-color: var(--blue-dim); background: rgba(37,99,255,0.04); }
 
-  .plan-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 2px;
-    background: var(--blue);
-    transform: scaleX(0);
-    transition: transform 0.2s;
-    transform-origin: left;
-  }
+  .plan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .plan-name { font-family: var(--sans); font-size: 16px; font-weight: 700; }
+  .plan-badge { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
+  .badge-active   { background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.25); }
+  .badge-trial    { background:rgba(245,158,11,0.12); color:var(--amber); border:1px solid rgba(245,158,11,0.25); }
+  .badge-paused   { background:rgba(90,90,114,0.2); color:var(--muted-hi); border:1px solid var(--border-hi); }
+  .badge-failed   { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.25); }
+  .badge-cancelled{ background:rgba(90,90,114,0.15); color:var(--muted); border:1px solid var(--border); }
+  .badge-inactive { background:rgba(90,90,114,0.2); color:var(--muted); border:1px solid var(--border); }
 
-  .plan-card:hover {
-    border-color: var(--blue-dim);
-    transform: translateY(-1px);
-  }
-
-  .plan-card:hover::before { transform: scaleX(1); }
-
-  .plan-card.active-plan {
-    border-color: var(--blue-dim);
-    background: rgba(37,99,255,0.04);
-  }
-
-  .plan-card.active-plan::before { transform: scaleX(1); }
-
-  .plan-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-  }
-
-  .plan-name {
-    font-family: var(--sans);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .plan-badge {
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 2px;
-  }
-
-  .badge-active   { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
-  .badge-trial    { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
-  .badge-paused   { background: rgba(90,90,114,0.2); color: var(--muted-hi); border: 1px solid var(--border-hi); }
-  .badge-failed   { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
-  .badge-inactive { background: rgba(90,90,114,0.2); color: var(--muted); border: 1px solid var(--border); }
-
-  .plan-price {
-    font-family: var(--sans);
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--blue);
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
-  }
-
-  .plan-price span {
-    font-size: 13px;
-    font-family: var(--mono);
-    color: var(--muted-hi);
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-
-  .plan-desc {
-    color: var(--muted-hi);
-    font-size: 12px;
-    line-height: 1.6;
-    margin: 12px 0 16px;
-  }
-
-  .plan-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    font-size: 11px;
-  }
-
+  .plan-price { font-family: var(--sans); font-size: 28px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; margin-bottom: 4px; }
+  .plan-price span { font-size: 13px; font-family: var(--mono); color: var(--muted-hi); font-weight: 400; }
+  .plan-desc { color: var(--muted-hi); font-size: 12px; line-height: 1.6; margin: 12px 0 16px; }
+  .plan-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; }
   .meta-item { color: var(--muted); }
   .meta-item strong { color: var(--muted-hi); display: block; font-weight: 500; }
-
-  .plan-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
-  }
+  .plan-actions { display: flex; gap: 8px; margin-top: 16px; }
 
   /* ── Buttons ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: none;
-    text-decoration: none;
-  }
-
-  .btn-primary {
-    background: var(--blue);
-    color: #fff;
-    box-shadow: 0 0 16px rgba(37,99,255,0.3);
-  }
-
-  .btn-primary:hover {
-    background: #3b75ff;
-    box-shadow: 0 0 24px rgba(37,99,255,0.45);
-    transform: translateY(-1px);
-  }
-
-  .btn-ghost {
-    background: transparent;
-    color: var(--muted-hi);
-    border: 1px solid var(--border-hi);
-  }
-
-  .btn-ghost:hover {
-    border-color: var(--blue-dim);
-    color: var(--text);
-  }
-
-  .btn-danger {
-    background: transparent;
-    color: var(--red);
-    border: 1px solid rgba(239,68,68,0.3);
-  }
-
-  .btn-danger:hover {
-    background: rgba(239,68,68,0.08);
-  }
-
-  .btn-sm {
-    padding: 5px 10px;
-    font-size: 10px;
-  }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 3px; cursor: pointer; transition: all 0.15s; border: none; }
+  .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 0 16px rgba(37,99,255,0.3); }
+  .btn-primary:hover { background: #3b75ff; box-shadow: 0 0 24px rgba(37,99,255,0.45); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; color: var(--muted-hi); border: 1px solid var(--border-hi); }
+  .btn-ghost:hover { border-color: var(--blue-dim); color: var(--text); }
+  .btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-danger:hover { background: rgba(239,68,68,0.08); }
+  .btn-sm { padding: 5px 10px; font-size: 10px; }
+  .btn-loading { opacity: 0.6; cursor: wait; }
 
   /* ── Form ── */
-  .form-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 28px;
-    margin-bottom: 24px;
-    animation: fadeIn 0.2s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .form-title {
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 28px; margin-bottom: 24px; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .form-title { font-family: var(--sans); font-size: 14px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
   .form-grid.cols-1 { grid-template-columns: 1fr; }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
+  .field { display: flex; flex-direction: column; gap: 6px; }
   .field.span-2 { grid-column: span 2; }
-  .field.span-3 { grid-column: span 3; }
-
-  label {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
+  label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
   input, textarea, select {
-    background: var(--bg);
-    border: 1px solid var(--border-hi);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 9px 12px;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    width: 100%;
+    background: var(--bg); border: 1px solid var(--border-hi); border-radius: 3px;
+    color: var(--text); font-family: var(--mono); font-size: 12px; padding: 10px 12px;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
   }
-
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--blue-dim);
-    box-shadow: 0 0 0 2px var(--blue-glow);
-  }
-
+  input:focus, textarea:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,255,0.1); }
   textarea { resize: vertical; min-height: 72px; }
+  .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  select option { background: var(--surface); }
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 10px 16px; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface); font-weight: 500; }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--muted-hi); font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+  td.id { color: var(--muted); font-size: 11px; }
+  td.name { color: var(--text); font-weight: 500; }
+  td.mono { font-family: var(--mono); }
 
-  .form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
+  /* ── Log ── */
+  .log-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .log-header { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .log-body { padding: 16px; height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+  .log-line { display: flex; gap: 12px; font-size: 11px; line-height: 1.5; }
+  .log-time { color: var(--muted); flex-shrink: 0; }
+  .log-ok   { color: var(--green); }
+  .log-err  { color: var(--red); }
+  .log-warn { color: var(--amber); }
+  .log-info { color: var(--blue); }
+
+  /* ── Tx submit ── */
+  .tx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  /* ── Wallet panel ── */
+  .wallet-panel {
+    background: var(--surface); border: 1px solid var(--border-hi);
+    border-radius: 4px; padding: 20px 24px; margin-bottom: 32px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
   }
+  .wallet-info { display: flex; flex-direction: column; gap: 4px; }
+  .wallet-addr { font-size: 12px; color: var(--text); }
+  .wallet-bal  { font-size: 11px; color: var(--muted-hi); }
+  .wallet-actions { display: flex; gap: 8px; align-items: center; }
+  .wallet-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .wallet-input-row input { width: 320px; }
 
-  /* ── Subscriptions table ── */
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
+  /* ── Section header ── */
+  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .section-title { font-family: var(--sans); font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .section-count { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  thead th {
-    background: rgba(0,0,0,0.3);
-    padding: 10px 16px;
-    text-align: left;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    font-weight: 500;
-  }
-
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(37,99,255,0.04); }
-
-  td {
-    padding: 12px 16px;
-    font-size: 12px;
-    color: var(--muted-hi);
-  }
-
-  td.id    { color: var(--muted); font-size: 11px; }
-  td.mono  { font-family: var(--mono); }
-  td.name  { color: var(--text); font-weight: 500; }
-  td.price { color: var(--blue); font-weight: 600; }
-
-  /* ── Terminal / activity log ── */
-  .log-panel {
-    background: #050508;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0;
-    overflow: hidden;
-  }
-
-  .log-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 16px;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .log-body {
-    padding: 16px;
-    max-height: 280px;
-    overflow-y: auto;
-    font-size: 11px;
-    line-height: 1.8;
-  }
-
-  .log-body::-webkit-scrollbar { width: 4px; }
-  .log-body::-webkit-scrollbar-track { background: transparent; }
-  .log-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
-
-  .log-line { display: flex; gap: 12px; }
-  .log-time { color: var(--muted); min-width: 80px; }
-  .log-event { }
-  .log-ok     { color: var(--green); }
-  .log-warn   { color: var(--amber); }
-  .log-err    { color: var(--red); }
-  .log-info   { color: var(--blue); }
-
-  /* ── Tx submit area ── */
-  .tx-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
+  /* ── Empty state ── */
+  .empty-state { text-align: center; padding: 64px 0; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 32px; margin-bottom: 12px; }
+  .empty-state .empty-sub { margin-top: 4px; font-size: 11px; }
 
   /* ── Toast ── */
-  .toast-area {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 1000;
-    pointer-events: none;
-  }
-
-  .toast {
-    background: var(--surface);
-    border: 1px solid var(--border-hi);
-    border-radius: 4px;
-    padding: 12px 16px;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideIn 0.25s ease;
-    pointer-events: all;
-    max-width: 320px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  }
-
+  .toast-area { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; pointer-events: none; }
+  .toast { background: var(--surface); border: 1px solid var(--border-hi); border-radius: 4px; padding: 12px 16px; font-size: 12px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.25s ease; pointer-events: all; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
   .toast.ok   { border-left: 3px solid var(--green); }
   .toast.err  { border-left: 3px solid var(--red); }
   .toast.info { border-left: 3px solid var(--blue); }
+  .toast.warn { border-left: 3px solid var(--amber); }
+  @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
+  /* ── Spinner ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
 
   /* ── Responsive ── */
   @media (max-width: 768px) {
@@ -668,60 +266,64 @@
     .field.span-2 { grid-column: span 1; }
     .tx-grid { grid-template-columns: 1fr; }
     header { padding: 0 16px; }
+    .wallet-input-row input { width: 100%; }
   }
 </style>
 </head>
 <body>
 
-<!-- ── Header ── -->
 <header>
   <div class="logo">
     <div class="logo-mark">
-      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 32 32" fill="none">
         <circle cx="16" cy="16" r="15" fill="black"/>
-        <!-- Circular arrow path -->
         <path d="M 16 4 A 12 12 0 1 1 6 22" stroke="white" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-        <!-- Arrowhead at end of arc -->
         <polyline points="3,18 6,22 10,20" stroke="#2563ff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <!-- Center dot -->
         <circle cx="16" cy="16" r="2.5" fill="white"/>
       </svg>
     </div>
     <span class="logo-name">Subex</span>
     <span class="logo-ticker">$SBX</span>
   </div>
-  <div class="header-status">
-    <div class="dot"></div>
-    <span>BETANET · BLOCK #<span id="live-height">—</span></span>
+  <div class="header-right">
+    <div class="wallet-pill" id="wallet-pill">
+      <div class="w-dot"></div>
+      <span id="wallet-pill-text">No wallet</span>
+    </div>
+    <div class="header-status">
+      <div class="dot" id="node-dot"></div>
+      <span>BETANET · BLOCK #<span id="live-height">—</span></span>
+    </div>
   </div>
 </header>
 
-<!-- ── Page ── -->
 <div class="page">
 
-  <!-- Hero -->
+  <div class="node-banner" id="node-banner">
+    ⚠ Cannot reach node at localhost:50002 — make sure <code>canopy start</code> is running.
+  </div>
+
   <section class="hero">
     <div class="hero-label">// programmable subscription infrastructure</div>
     <h1 class="hero-title">Recurring payments.<br><span>On-chain.</span></h1>
     <p class="hero-sub">Create subscription tiers, automate billing, enforce cancellations — without intermediaries. Payments validated by the network. Revenue goes directly to creators.</p>
   </section>
 
-  <!-- Stats -->
-  <div class="stats-bar" id="stats-bar">
+  <div class="stats-bar">
     <div class="stat">
       <div class="stat-label">Total Plans</div>
-      <div class="stat-value blue" id="stat-plans">0</div>
-      <div class="stat-delta">↑ on-chain</div>
+      <div class="stat-value blue" id="stat-plans">—</div>
+      <div class="stat-delta live" id="stat-plans-delta">polling…</div>
     </div>
     <div class="stat">
       <div class="stat-label">Active Subscriptions</div>
-      <div class="stat-value green" id="stat-subs">0</div>
-      <div class="stat-delta">↑ live</div>
+      <div class="stat-value green" id="stat-subs">—</div>
+      <div class="stat-delta live" id="stat-subs-delta">polling…</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Total Billed</div>
-      <div class="stat-value" id="stat-billed">0 SBX</div>
-      <div class="stat-delta">cumulative</div>
+      <div class="stat-label">Wallet Balance</div>
+      <div class="stat-value" id="stat-balance">—</div>
+      <div class="stat-delta" id="stat-balance-delta">uSBX</div>
     </div>
     <div class="stat">
       <div class="stat-label">Billing Reward</div>
@@ -730,7 +332,6 @@
     </div>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" onclick="setTab('plans')">Plans</div>
     <div class="tab" onclick="setTab('subscriptions')">Subscriptions</div>
@@ -740,16 +341,17 @@
 
   <!-- ── Tab: Plans ── -->
   <div class="tab-content active" id="tab-plans">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div class="section-header" style="margin:0;">
         <span class="section-title">Subscription Plans</span>
-        <span class="section-count" id="plans-count">0 ACTIVE</span>
+        <span class="section-count" id="plans-count">—</span>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="toggleCreateForm()">+ Create Plan</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="refreshState()">↻ Refresh</button>
+        <button class="btn btn-primary btn-sm" onclick="toggleCreateForm()">+ Create Plan</button>
+      </div>
     </div>
 
-    <!-- Create plan form (hidden by default) -->
     <div class="form-panel" id="create-plan-form" style="display:none;">
       <div class="form-title">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1" stroke="#2563ff" stroke-width="1.5"/><path d="M7 4v6M4 7h6" stroke="#2563ff" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -757,20 +359,16 @@
       </div>
       <div class="form-grid">
         <div class="field">
-          <label>Creator Address</label>
-          <input type="text" id="cp-creator" placeholder="0x..." />
-        </div>
-        <div class="field">
           <label>Plan Name</label>
           <input type="text" id="cp-name" placeholder="Pro Monthly" maxlength="64" />
-        </div>
-        <div class="field span-2">
-          <label>Description</label>
-          <textarea id="cp-desc" placeholder="What subscribers get..." maxlength="280"></textarea>
         </div>
         <div class="field">
           <label>Price (uSBX / cycle)</label>
           <input type="number" id="cp-price" placeholder="1000000" min="1" />
+        </div>
+        <div class="field span-2">
+          <label>Description</label>
+          <textarea id="cp-desc" placeholder="What subscribers get…" maxlength="280"></textarea>
         </div>
         <div class="field">
           <label>Interval (days)</label>
@@ -786,48 +384,38 @@
         </div>
       </div>
       <div class="form-actions">
-        <button class="btn btn-primary" onclick="submitCreatePlan()">Deploy Plan →</button>
+        <button class="btn btn-primary" id="btn-create-plan" onclick="submitCreatePlan()">Deploy Plan →</button>
         <button class="btn btn-ghost" onclick="toggleCreateForm()">Cancel</button>
       </div>
     </div>
 
-    <!-- Plans grid -->
-    <div class="plans-grid" id="plans-grid">
-      <!-- populated by JS -->
-    </div>
-
-    <div id="plans-empty" style="display:none; text-align:center; padding:64px 0; color:var(--muted);">
-      <div style="font-size:32px; margin-bottom:12px;">◎</div>
+    <div class="plans-grid" id="plans-grid"></div>
+    <div class="empty-state" id="plans-empty" style="display:none;">
+      <div class="empty-icon">◎</div>
       <div>No plans deployed yet.</div>
-      <div style="margin-top:4px; font-size:11px;">Create the first subscription plan on Subex.</div>
+      <div class="empty-sub">Create the first subscription plan on Subex.</div>
     </div>
-
   </div>
 
   <!-- ── Tab: Subscriptions ── -->
   <div class="tab-content" id="tab-subscriptions">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div class="section-header" style="margin:0;">
         <span class="section-title">Subscriptions</span>
-        <span class="section-count" id="subs-count">0 RECORDS</span>
+        <span class="section-count" id="subs-count">—</span>
       </div>
+      <button class="btn btn-ghost btn-sm" onclick="refreshState()">↻ Refresh</button>
     </div>
-
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>#ID</th>
-            <th>Plan</th>
-            <th>Subscriber</th>
-            <th>Status</th>
-            <th>Billing Cycle</th>
-            <th>Next Bill</th>
-            <th>Actions</th>
+            <th>#ID</th><th>Plan</th><th>Subscriber</th><th>Status</th>
+            <th>Billing Cycle</th><th>Next Bill Height</th><th>Actions</th>
           </tr>
         </thead>
         <tbody id="subs-tbody">
-          <tr><td colspan="7" style="text-align:center; padding:32px; color:var(--muted);">No subscriptions yet.</td></tr>
+          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">Loading subscriptions…</td></tr>
         </tbody>
       </table>
     </div>
@@ -835,27 +423,34 @@
 
   <!-- ── Tab: Submit Tx ── -->
   <div class="tab-content" id="tab-submit">
-    <div class="section-header">
-      <span class="section-title">Submit Transaction</span>
+
+    <!-- Wallet loader -->
+    <div class="wallet-panel" id="wallet-panel">
+      <div class="wallet-info">
+        <div style="font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Active Wallet</div>
+        <div class="wallet-addr" id="wp-addr">Not loaded</div>
+        <div class="wallet-bal" id="wp-bal">—</div>
+      </div>
+      <div class="wallet-actions">
+        <div class="wallet-input-row">
+          <input type="text" id="wl-addr" placeholder="Validator address (hex)" value="e7c7dad131a03f7ea0cc09a637ad096eb3495f77" style="width:340px;" />
+          <input type="password" id="wl-pass" placeholder="Password" value="test123" style="width:120px;" />
+          <button class="btn btn-ghost btn-sm" onclick="loadWalletUI()">Load Wallet</button>
+        </div>
+      </div>
     </div>
 
-    <div class="tx-grid">
+    <div class="section-header"><span class="section-title">Submit Transaction</span></div>
 
+    <div class="tx-grid">
       <!-- Subscribe -->
       <div class="form-panel">
         <div class="form-title">Subscribe to Plan</div>
         <div class="form-grid cols-1">
-          <div class="field">
-            <label>Subscriber Address</label>
-            <input type="text" id="sub-addr" placeholder="0x..." />
-          </div>
-          <div class="field">
-            <label>Plan ID</label>
-            <input type="number" id="sub-plan-id" placeholder="1" min="1" />
-          </div>
+          <div class="field"><label>Plan ID</label><input type="number" id="sub-plan-id" placeholder="1" min="1" /></div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary btn-sm" onclick="submitSubscribe()">Subscribe →</button>
+          <button class="btn btn-primary btn-sm" id="btn-subscribe" onclick="submitSubscribe()">Subscribe →</button>
         </div>
       </div>
 
@@ -863,35 +458,21 @@
       <div class="form-panel">
         <div class="form-title">Process Billing</div>
         <div class="form-grid cols-1">
-          <div class="field">
-            <label>Processor Address</label>
-            <input type="text" id="proc-addr" placeholder="0x..." />
-          </div>
-          <div class="field">
-            <label>Subscription ID</label>
-            <input type="number" id="proc-sub-id" placeholder="1" min="1" />
-          </div>
+          <div class="field"><label>Subscription ID</label><input type="number" id="proc-sub-id" placeholder="1" min="1" /></div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary btn-sm" onclick="submitProcessBilling()">Process →</button>
+          <button class="btn btn-primary btn-sm" id="btn-billing" onclick="submitProcessBilling()">Process →</button>
         </div>
       </div>
 
-      <!-- Cancel Subscription -->
+      <!-- Cancel -->
       <div class="form-panel">
         <div class="form-title">Cancel Subscription</div>
         <div class="form-grid cols-1">
-          <div class="field">
-            <label>Subscriber Address</label>
-            <input type="text" id="cancel-addr" placeholder="0x..." />
-          </div>
-          <div class="field">
-            <label>Subscription ID</label>
-            <input type="number" id="cancel-sub-id" placeholder="1" min="1" />
-          </div>
+          <div class="field"><label>Subscription ID</label><input type="number" id="cancel-sub-id" placeholder="1" min="1" /></div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-danger btn-sm" onclick="submitCancel()">Cancel Sub</button>
+          <button class="btn btn-danger btn-sm" id="btn-cancel" onclick="submitCancel()">Cancel Sub</button>
         </div>
       </div>
 
@@ -899,87 +480,56 @@
       <div class="form-panel">
         <div class="form-title">Pause / Resume</div>
         <div class="form-grid cols-1">
-          <div class="field">
-            <label>Subscriber Address</label>
-            <input type="text" id="pause-addr" placeholder="0x..." />
-          </div>
-          <div class="field">
-            <label>Subscription ID</label>
-            <input type="number" id="pause-sub-id" placeholder="1" min="1" />
-          </div>
+          <div class="field"><label>Subscription ID</label><input type="number" id="pause-sub-id" placeholder="1" min="1" /></div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-ghost btn-sm" onclick="submitPause()">Pause</button>
-          <button class="btn btn-ghost btn-sm" onclick="submitResume()">Resume</button>
+          <button class="btn btn-ghost btn-sm" id="btn-pause" onclick="submitPause()">Pause</button>
+          <button class="btn btn-ghost btn-sm" id="btn-resume" onclick="submitResume()">Resume</button>
         </div>
       </div>
 
-    </div>
-
-    <!-- Update Plan -->
-    <div class="form-panel">
-      <div class="form-title">Update Plan</div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Creator Address</label>
-          <input type="text" id="upd-creator" placeholder="0x..." />
+      <!-- Update Plan -->
+      <div class="form-panel" style="grid-column:span 2;">
+        <div class="form-title">Update Plan</div>
+        <div class="form-grid">
+          <div class="field"><label>Plan ID</label><input type="number" id="upd-plan-id" placeholder="1" min="1" /></div>
+          <div class="field"><label>New Name (blank = no change)</label><input type="text" id="upd-name" placeholder="New name" /></div>
+          <div class="field"><label>New Price uSBX (0 = no change)</label><input type="number" id="upd-price" placeholder="0" min="0" /></div>
+          <div class="field span-2"><label>New Description (blank = no change)</label><textarea id="upd-desc" placeholder="Updated description…"></textarea></div>
         </div>
-        <div class="field">
-          <label>Plan ID</label>
-          <input type="number" id="upd-plan-id" placeholder="1" min="1" />
+        <div class="form-actions">
+          <button class="btn btn-primary btn-sm" id="btn-update" onclick="submitUpdatePlan()">Update Plan →</button>
         </div>
-        <div class="field">
-          <label>New Name (blank = no change)</label>
-          <input type="text" id="upd-name" placeholder="" />
-        </div>
-        <div class="field">
-          <label>New Price in uSBX (0 = no change)</label>
-          <input type="number" id="upd-price" placeholder="0" min="0" />
-        </div>
-        <div class="field span-2">
-          <label>New Description (blank = no change)</label>
-          <textarea id="upd-desc" placeholder=""></textarea>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn btn-primary btn-sm" onclick="submitUpdatePlan()">Update Plan →</button>
       </div>
     </div>
-
   </div>
 
   <!-- ── Tab: Activity Log ── -->
   <div class="tab-content" id="tab-log">
-    <div class="section-header">
-      <span class="section-title">Activity Log</span>
-    </div>
+    <div class="section-header"><span class="section-title">Activity Log</span></div>
     <div class="log-panel">
       <div class="log-header">
-        <div class="dot"></div>
+        <div class="dot" id="log-dot"></div>
         LIVE · RPC http://localhost:50002
       </div>
       <div class="log-body" id="log-body">
-        <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">Subex node initialized. Waiting for connection...</span></div>
+        <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">Subex initializing…</span></div>
       </div>
     </div>
   </div>
 
-</div><!-- /page -->
+</div>
 
-<!-- Toast area -->
 <div class="toast-area" id="toast-area"></div>
 
 <script>
 // ════════════════════════════════════════════════════════════════════════════
-// SUBEX FRONTEND — CANOPY BUILDER GUIDE COMPLIANT
-// Key rules from the guide:
-//  • All RPC endpoints use POST (GET returns 405)
-//  • TX endpoint is /v1/tx (singular — /v1/txs returns 405)
-//  • Core types (send) use one body format; plugin types use msgTypeUrl + msgBytes
-//  • Signature fields are HEX strings (not base64)
-//  • Addresses are SHA256(pubKey).slice(0,20) — NOT the raw pubkey
-//  • txTime computed ONCE — reused in both sign bytes and tx body
-//  • Empty memo is OMITTED from sign bytes (proto3 omits empty strings)
+// SUBEX LIVE FRONTEND — Full on-chain mode
+// - No DEMO_MODE
+// - Auto-loads wallet on boot
+// - Polls real block height
+// - Rebuilds state from tx history
+// - All tx submissions hit real RPC
 // ════════════════════════════════════════════════════════════════════════════
 
 const RPC        = 'http://localhost:50002';
@@ -987,7 +537,9 @@ const ARPC       = 'http://localhost:50003';
 const NETWORK_ID = 1;
 const CHAIN_ID   = 1;
 
-// ── Type URLs — must exactly match ContractConfig.TransactionTypeUrls order ─
+const VALIDATOR_ADDRESS  = 'e7c7dad131a03f7ea0cc09a637ad096eb3495f77';
+const VALIDATOR_PASSWORD = 'test123';
+
 const TYPE_URLS = {
   'send':                'type.googleapis.com/types.MessageSend',
   'create_plan':         'type.googleapis.com/types.MessageCreatePlan',
@@ -999,8 +551,7 @@ const TYPE_URLS = {
   'update_plan':         'type.googleapis.com/types.MessageUpdatePlan',
 };
 
-// ── Minimal Protobuf Encoder (no library needed) ──────────────────────────
-// From the Canopy Builder Guide — hand-roll protobuf encoding in the browser.
+// ── Protobuf Encoder ──────────────────────────────────────────────────────
 function encodeVarint(val) {
   const bytes = [];
   let v = typeof val === 'bigint' ? val : BigInt(val);
@@ -1018,14 +569,14 @@ function protoEncode(fields) {
   for (const f of fields) {
     if (f.value === undefined || f.value === null) continue;
     if (f.type === 'string') {
-      if (f.value === '') continue; // proto3: omit empty strings
+      if (f.value === '') continue;
       const enc = new TextEncoder().encode(f.value);
       parts.push(encodeTag(f.field, 2), encodeVarint(enc.length), enc);
     } else if (f.type === 'bytes') {
       if (!f.value?.length) continue;
       parts.push(encodeTag(f.field, 2), encodeVarint(f.value.length), f.value);
     } else if (f.type === 'varint') {
-      if (f.value === 0 || f.value === 0n) continue; // proto3: omit zero values
+      if (f.value === 0 || f.value === 0n) continue;
       parts.push(encodeTag(f.field, 0), encodeVarint(f.value));
     }
   }
@@ -1034,29 +585,20 @@ function protoEncode(fields) {
   for (const p of parts) { out.set(p, off); off += p.length; }
   return out;
 }
-
-// Encode google.protobuf.Any { typeUrl, value }
 function encodeAny(typeUrl, valueBytes) {
   return protoEncode([
     { field: 1, type: 'string', value: typeUrl },
     { field: 2, type: 'bytes',  value: valueBytes },
   ]);
 }
-
-// Build Transaction sign bytes — signature field (3) MUST be omitted entirely.
-// memo field (7) MUST be omitted when empty (proto3 omits empty strings — emitting
-// it would produce bytes the node doesn't include, causing signature mismatch).
 function buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time, memo, networkID, chainID }) {
   const txTime = typeof time === 'bigint' ? time : BigInt(time);
   const anyBytes = encodeAny(msgTypeUrl, msgBytes);
   const fields = [
-    { field: 1, type: 'string', value: type },      // message_type
-    { field: 2, type: 'bytes',  value: anyBytes },   // msg (Any)
-    // field 3 = signature — MUST be omitted
-    // field 4 = created_height — omit if 0
-    { field: 5, type: 'varint', value: txTime },     // time (microseconds)
-    { field: 6, type: 'varint', value: fee },        // fee
-    // field 7 = memo — only when non-empty
+    { field: 1, type: 'string', value: type },
+    { field: 2, type: 'bytes',  value: anyBytes },
+    { field: 5, type: 'varint', value: txTime },
+    { field: 6, type: 'varint', value: fee },
     { field: 8, type: 'varint', value: networkID || 1 },
     { field: 9, type: 'varint', value: chainID  || 1 },
   ];
@@ -1064,8 +606,7 @@ function buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time, memo, networkID
   return protoEncode(fields);
 }
 
-// ── BLS12-381 Signing ─────────────────────────────────────────────────────
-// Loaded lazily from esm.sh — works on mobile (Termux/Userland browser).
+// ── BLS12-381 ─────────────────────────────────────────────────────────────
 let _bls;
 async function loadBLS() {
   if (_bls) return _bls;
@@ -1073,48 +614,28 @@ async function loadBLS() {
   _bls = mod.bls12_381;
   return _bls;
 }
-
-// Derive Canopy address from BLS public key bytes
-// Address = SHA256(pubKeyBytes).slice(0, 20)
 async function pubKeyToAddress(pubKeyBytes) {
   const hash = await crypto.subtle.digest('SHA-256', pubKeyBytes);
   return new Uint8Array(hash).slice(0, 20);
 }
-
-// ── Build + Sign Complete TX ──────────────────────────────────────────────
-// CRITICAL: txTime computed ONCE here and reused in both sign bytes and tx body.
-// Two calls to Date.now() = different values = signature mismatch every time.
-async function buildTx(type, msgTypeUrl, msgBytes, wallet, fee = 10000, memo = '') {
+async function buildTx(type, msgTypeUrl, msgBytes, fee = 10000, memo = '') {
   const bls = await loadBLS();
-  const txTime = BigInt(Date.now() * 1000); // microseconds — computed ONCE
-  const signBytes = buildSignBytes({
-    type, msgTypeUrl, msgBytes, fee,
-    time: txTime, // reuse
-    memo: memo || '',
-    networkID: NETWORK_ID,
-    chainID: CHAIN_ID,
-  });
-  const sigBytes = await bls.sign(signBytes, wallet.privKey); // G2, 96 bytes
-  // Signature fields are HEX (not base64) — checklist item
+  const txTime = BigInt(Date.now() * 1000);
+  const signBytes = buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time: txTime, memo, networkID: NETWORK_ID, chainID: CHAIN_ID });
+  const sigBytes = await bls.sign(signBytes, wallet.privKey);
   return {
-    type,
-    msgTypeUrl,
-    msgBytes:  bytesToHex(msgBytes),   // hex-encoded protobuf bytes of the inner message
-    fee,
-    time:      Number(txTime),         // same value — not a new Date.now() call
-    memo:      memo || '',
-    networkID: NETWORK_ID,
-    chainID:   CHAIN_ID,
+    type, msgTypeUrl,
+    msgBytes:  bytesToHex(msgBytes),
+    fee, time: Number(txTime), memo: memo || '',
+    networkID: NETWORK_ID, chainID: CHAIN_ID,
     signature: {
-      publicKey: bytesToHex(wallet.pubKey), // hex, 48 bytes
-      signature: bytesToHex(sigBytes),      // hex, 96 bytes
+      publicKey: bytesToHex(wallet.pubKey),
+      signature: bytesToHex(sigBytes),
     },
   };
 }
 
-// ── Protobuf Encoders for Each Subex Message Type ─────────────────────────
-// These produce the msgBytes field for the plugin tx body format.
-
+// ── Message Encoders ──────────────────────────────────────────────────────
 function encodeMsgCreatePlan(msg) {
   return protoEncode([
     { field: 1, type: 'bytes',  value: msg.creatorAddress },
@@ -1174,154 +695,411 @@ function hexToBytes(hex) {
   for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(clean.slice(i*2, i*2+2), 16);
   return bytes;
 }
-function bytesToHex(b) {
-  return Array.from(b).map(x => x.toString(16).padStart(2, '0')).join('');
-}
-function bytesToBase64(b) {
-  let s = '';
-  for (let i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
-  return btoa(s);
-}
+function bytesToHex(b) { return Array.from(b).map(x => x.toString(16).padStart(2,'0')).join(''); }
 
 // ── RPC Helpers ───────────────────────────────────────────────────────────
-// All Canopy endpoints use POST. GET returns 405.
+let nodeOnline = false;
 async function postRPC(url, body = {}) {
   try {
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
     const text = await r.text();
     if (r.status >= 400) throw new Error(`HTTP ${r.status}: ${text}`);
+    nodeOnline = true;
+    setNodeStatus(true);
     return JSON.parse(text);
   } catch(e) {
+    if (url.includes('50002') || url.includes('50003')) {
+      nodeOnline = false;
+      setNodeStatus(false);
+    }
     return { error: e.message };
   }
+}
+function setNodeStatus(online) {
+  const dot = document.getElementById('node-dot');
+  const logDot = document.getElementById('log-dot');
+  const banner = document.getElementById('node-banner');
+  dot.className = 'dot' + (online ? '' : ' offline');
+  if (logDot) logDot.className = 'dot' + (online ? '' : ' offline');
+  banner.classList.toggle('show', !online);
 }
 
 async function getHeight() {
   const r = await postRPC(`${RPC}/v1/query/height`, {});
-  return r.height || 0;
+  return r.height || r.Height || 0;
 }
-async function getAccountBalance(address) {
-  const r = await postRPC(`${RPC}/v1/query/account`, { address });
-  return r.amount || 0;
+async function getAccountBalance(addrHex) {
+  const r = await postRPC(`${RPC}/v1/query/account`, { address: addrHex });
+  return r.amount || r.Amount || 0;
 }
-async function keystoreNewKey(nickname, password) {
-  return postRPC(`${ARPC}/v1/admin/keystore-new-key`, { nickname, password });
+async function getTxsBySender(addrHex, perPage = 100) {
+  const r = await postRPC(`${RPC}/v1/query/txs-by-sender`, { address: addrHex, perPage, page: 1 });
+  return r.results || r.Results || [];
 }
-async function keystoreGetKey(address, password) {
-  const r = await postRPC(`${ARPC}/v1/admin/keystore-get`, { address, password });
-  return {
-    address:    r.address    || r.Address,
-    publicKey:  r.publicKey  || r.PublicKey  || r.public_key,
-    privateKey: r.privateKey || r.PrivateKey || r.private_key,
-  };
-}
-async function waitForTxInclusion(senderAddr, timeoutMs = 60000) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    const r = await postRPC(`${RPC}/v1/query/txs-by-sender`, { address: senderAddr, perPage: 5 });
-    if (!r.error && r.results?.length) return true;
-    await new Promise(res => setTimeout(res, 1200));
-  }
-  return false;
-}
-// Submit — endpoint is /v1/tx (singular — /v1/txs returns 405)
 async function submitTx(txBody) {
   return postRPC(`${RPC}/v1/tx`, txBody);
 }
 
-// ── Wallet State (loaded from keystore for live mode) ─────────────────────
-let wallet = null; // { address, pubKey: Uint8Array, privKey: Uint8Array }
+// ── Wallet State ──────────────────────────────────────────────────────────
+let wallet = null;
 
-async function loadWallet(addressHex, password = '') {
-  const k = await keystoreGetKey(addressHex, password);
-  if (k.error) { toast('err', 'Keystore error: ' + k.error); return false; }
-  const pubKeyBytes  = hexToBytes(k.publicKey);
-  const privKeyBytes = hexToBytes(k.privateKey);
+async function loadWallet(addressHex, password) {
+  const r = await postRPC(`${ARPC}/v1/admin/keystore-get`, { address: addressHex, password });
+  if (r.error) { toast('err', 'Keystore error: ' + r.error); log('err', 'Wallet load failed: ' + r.error); return false; }
+  const pubKeyHex  = r.publicKey  || r.PublicKey  || r.public_key  || '';
+  const privKeyHex = r.privateKey || r.PrivateKey || r.private_key || '';
+  if (!pubKeyHex || !privKeyHex) { toast('err', 'Keystore returned empty keys'); return false; }
   wallet = {
-    address: k.address,
-    pubKey:  pubKeyBytes,
-    privKey: privKeyBytes,
+    address: addressHex,
+    pubKey:  hexToBytes(pubKeyHex),
+    privKey: hexToBytes(privKeyHex),
   };
-  log('ok', `Wallet loaded: ${k.address}`);
+  // Update wallet pill
+  const pill = document.getElementById('wallet-pill');
+  pill.classList.add('loaded');
+  document.getElementById('wallet-pill-text').textContent = addressHex.slice(0,8) + '…' + addressHex.slice(-6);
+  // Update wallet panel
+  document.getElementById('wp-addr').textContent = addressHex;
+  const bal = await getAccountBalance(addressHex);
+  document.getElementById('wp-bal').textContent = bal.toLocaleString() + ' uSBX';
+  document.getElementById('stat-balance').textContent = (bal / 1_000_000).toFixed(2) + ' SBX';
+  log('ok', `Wallet loaded: ${addressHex}`);
   toast('ok', 'Wallet loaded.');
   return true;
 }
 
-// ── App State ─────────────────────────────────────────────────────────────
-let plans = [];
-let subs  = [];
-let blockHeight = 0;
-
-// DEMO_MODE = true  → mock data, no node required
-// DEMO_MODE = false → live node at localhost:50002/50003 required
-const DEMO_MODE = true;
-
-const mockPlans = [
-  { id: 1, name: "Creator Pro",  description: "Unlimited content access, early releases, and direct creator chat.", price: 5000000,  intervalDays: 30, trialDays: 7,  maxSubscribers: 0,   activeSubs: 142, active: true, createdHeight: 1201 },
-  { id: 2, name: "Dev Access",   description: "Full API access, priority support, and SDK downloads for developers.", price: 15000000, intervalDays: 30, trialDays: 0,  maxSubscribers: 500, activeSubs: 87,  active: true, createdHeight: 1450 },
-  { id: 3, name: "Community",    description: "Membership with voting rights and exclusive Discord access.", price: 1000000,  intervalDays: 30, trialDays: 14, maxSubscribers: 0,   activeSubs: 931, active: true, createdHeight: 1550 },
-];
-const mockSubs = [
-  { id: 1, planId: 1, planName: "Creator Pro", subscriberAddress: "a1b2c3d4e5f6a1b2c3d4", status: "active",    billingCycle: 3, nextBillingHeight: 11800 },
-  { id: 2, planId: 3, planName: "Community",   subscriberAddress: "f6e5d4c3b2a1f6e5d4c3", status: "trial",     billingCycle: 0, nextBillingHeight: 5000  },
-  { id: 3, planId: 2, planName: "Dev Access",  subscriberAddress: "1a2b3c4d5e6f1a2b3c4d", status: "paused",    billingCycle: 1, nextBillingHeight: 12400 },
-  { id: 4, planId: 1, planName: "Creator Pro", subscriberAddress: "dead4eef42dead4eef42", status: "failed",    billingCycle: 2, nextBillingHeight: 10000 },
-];
-
-// ── Init ──────────────────────────────────────────────────────────────────
-function init() {
-  if (DEMO_MODE) {
-    plans = mockPlans; subs = mockSubs; blockHeight = 10342;
-    document.getElementById('live-height').textContent = blockHeight.toLocaleString();
-    renderAll();
-    log('info', 'Demo mode. Set DEMO_MODE=false and connect node at localhost:50002 to go live.');
-    log('ok', 'Subex plugin loaded. 3 plans active.');
-  } else {
-    pollHeight();
-  }
-  setInterval(() => {
-    if (!DEMO_MODE) { pollHeight(); }
-    else { blockHeight += Math.floor(Math.random()*3)+1; document.getElementById('live-height').textContent = blockHeight.toLocaleString(); }
-  }, 6000);
+async function loadWalletUI() {
+  const addr = document.getElementById('wl-addr').value.trim();
+  const pass = document.getElementById('wl-pass').value;
+  if (!addr) { toast('err', 'Enter wallet address'); return; }
+  await loadWallet(addr, pass);
 }
+
+// ── App State ─────────────────────────────────────────────────────────────
+let plans       = [];
+let subs        = [];
+let blockHeight = 0;
+let allTxs      = []; // raw tx history from chain
+
+// ── State Rebuilder — parse tx history to reconstruct plans + subs ────────
+// Since Canopy doesn't expose plugin state via query directly,
+// we read all txs from this wallet and reconstruct local state.
+// For a production app you'd query all senders; here we show wallet's own activity.
+async function fetchChainState() {
+  if (!wallet) return;
+  try {
+    const txs = await getTxsBySender(wallet.address, 200);
+    allTxs = txs;
+
+    // Reset and rebuild
+    const planMap = new Map();
+    const subMap  = new Map();
+    let planCounter = 0;
+    let subCounter  = 0;
+
+    for (const tx of txs) {
+      const type = tx.messageType || tx.message_type || tx.type || '';
+      const msg  = tx.msg || tx.message || {};
+
+      if (type === 'create_plan') {
+        planCounter++;
+        planMap.set(planCounter, {
+          id: planCounter,
+          name: msg.name || '(unnamed)',
+          description: msg.description || '',
+          price: Number(msg.price || 0),
+          intervalDays: Number(msg.intervalDays || msg.interval_days || 30),
+          trialDays: Number(msg.trialDays || msg.trial_days || 0),
+          maxSubscribers: Number(msg.maxSubscribers || msg.max_subscribers || 0),
+          activeSubs: 0,
+          active: true,
+          createdHeight: Number(tx.createdHeight || tx.created_height || 0),
+          creatorAddress: msg.creatorAddress || msg.creator_address || wallet.address,
+        });
+      }
+      if (type === 'subscribe') {
+        subCounter++;
+        const planId = Number(msg.planId || msg.plan_id || 0);
+        const plan = planMap.get(planId);
+        if (plan) plan.activeSubs++;
+        subMap.set(subCounter, {
+          id: subCounter,
+          planId,
+          planName: plan?.name || `Plan #${planId}`,
+          subscriberAddress: msg.subscriberAddress || msg.subscriber_address || wallet.address,
+          status: 'active',
+          billingCycle: 0,
+          nextBillingHeight: Number(tx.createdHeight || 0) + (plan?.intervalDays || 30) * 3600,
+        });
+      }
+      if (type === 'process_billing') {
+        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
+        const sub = subMap.get(subId);
+        if (sub) { sub.billingCycle++; sub.nextBillingHeight += (planMap.get(sub.planId)?.intervalDays || 30) * 3600; }
+      }
+      if (type === 'cancel_subscription') {
+        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
+        const sub = subMap.get(subId);
+        if (sub) {
+          sub.status = 'cancelled';
+          const plan = planMap.get(sub.planId);
+          if (plan && plan.activeSubs > 0) plan.activeSubs--;
+        }
+      }
+      if (type === 'pause_subscription') {
+        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
+        const sub = subMap.get(subId);
+        if (sub) sub.status = 'paused';
+      }
+      if (type === 'resume_subscription') {
+        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
+        const sub = subMap.get(subId);
+        if (sub) sub.status = 'active';
+      }
+      if (type === 'update_plan') {
+        const planId = Number(msg.planId || msg.plan_id || 0);
+        const plan = planMap.get(planId);
+        if (plan) {
+          if (msg.name) plan.name = msg.name;
+          if (msg.description) plan.description = msg.description;
+          if (msg.newPrice || msg.new_price) plan.price = Number(msg.newPrice || msg.new_price);
+          if (msg.maxSubscribers || msg.max_subscribers) plan.maxSubscribers = Number(msg.maxSubscribers || msg.max_subscribers);
+        }
+      }
+    }
+
+    plans = Array.from(planMap.values());
+    subs  = Array.from(subMap.values());
+    renderAll();
+    log('info', `State refreshed: ${plans.length} plans, ${subs.length} subscriptions, ${txs.length} txs`);
+  } catch(e) {
+    log('warn', 'State refresh failed: ' + e.message);
+  }
+}
+
+// ── Polling ───────────────────────────────────────────────────────────────
 async function pollHeight() {
   const h = await getHeight();
-  if (h) { blockHeight = h; document.getElementById('live-height').textContent = blockHeight.toLocaleString(); }
+  if (h) {
+    blockHeight = h;
+    document.getElementById('live-height').textContent = h.toLocaleString();
+  }
+}
+
+async function refreshState() {
+  await pollHeight();
+  await fetchChainState();
+  if (wallet) {
+    const bal = await getAccountBalance(wallet.address);
+    document.getElementById('stat-balance').textContent = (bal / 1_000_000).toFixed(2) + ' SBX';
+    document.getElementById('wp-bal').textContent = bal.toLocaleString() + ' uSBX';
+  }
+  toast('info', 'State refreshed from chain.');
+}
+
+// ── Submit Handlers ───────────────────────────────────────────────────────
+function requireWallet() {
+  if (!wallet) { toast('err', 'Load wallet first in the Submit Tx tab.'); return false; }
+  return true;
+}
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.classList.toggle('btn-loading', loading);
+  if (loading) btn.innerHTML = '<span class="spinner"></span> Submitting…';
+}
+function resetBtn(btnId, label) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = false;
+  btn.classList.remove('btn-loading');
+  btn.textContent = label;
+}
+
+async function submitCreatePlan() {
+  if (!requireWallet()) return;
+  const name     = document.getElementById('cp-name').value.trim();
+  const price    = parseInt(document.getElementById('cp-price').value) || 0;
+  const desc     = document.getElementById('cp-desc').value.trim();
+  const interval = parseInt(document.getElementById('cp-interval').value) || 0;
+  const trial    = parseInt(document.getElementById('cp-trial').value) || 0;
+  const maxSubs  = parseInt(document.getElementById('cp-maxsubs').value) || 0;
+  if (!name || !price || !interval) { toast('err', 'Name, price and interval are required.'); return; }
+
+  setLoading('btn-create-plan', true);
+  try {
+    const creatorAddr = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgCreatePlan({ creatorAddress: creatorAddr, name, description: desc, price, intervalDays: interval, trialDays: trial, maxSubscribers: maxSubs });
+    const txBody = await buildTx('create_plan', TYPE_URLS['create_plan'], msgBytes, 50000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `create_plan failed: ${r.error}`); }
+    else { toast('ok', `Plan "${name}" submitted.`); log('ok', `create_plan → "${name}" · ${price} uSBX / ${interval}d`); toggleCreateForm(); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'create_plan error: ' + e.message); }
+  resetBtn('btn-create-plan', 'Deploy Plan →');
+}
+
+async function submitSubscribe() {
+  if (!requireWallet()) return;
+  const planId = parseInt(document.getElementById('sub-plan-id').value) || 0;
+  if (!planId) { toast('err', 'Plan ID required.'); return; }
+
+  setLoading('btn-subscribe', true);
+  try {
+    const subAddr  = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgSubscribe({ subscriberAddress: subAddr, planId });
+    const txBody   = await buildTx('subscribe', TYPE_URLS['subscribe'], msgBytes, 10000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `subscribe failed: ${r.error}`); }
+    else { toast('ok', `Subscribed to plan #${planId}.`); log('ok', `subscribe → planId=${planId}`); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'subscribe error: ' + e.message); }
+  resetBtn('btn-subscribe', 'Subscribe →');
+}
+
+async function submitProcessBilling() {
+  if (!requireWallet()) return;
+  const subId = parseInt(document.getElementById('proc-sub-id').value) || 0;
+  if (!subId) { toast('err', 'Subscription ID required.'); return; }
+
+  setLoading('btn-billing', true);
+  try {
+    const procAddr = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgProcessBilling({ processorAddress: procAddr, subscriptionId: subId });
+    const txBody   = await buildTx('process_billing', TYPE_URLS['process_billing'], msgBytes, 5000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `process_billing failed: ${r.error}`); }
+    else { toast('ok', `Billing processed for sub #${subId}. +1 SBX reward.`); log('ok', `process_billing → subId=${subId}`); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'process_billing error: ' + e.message); }
+  resetBtn('btn-billing', 'Process →');
+}
+
+async function submitCancel() {
+  if (!requireWallet()) return;
+  const subId = parseInt(document.getElementById('cancel-sub-id').value) || 0;
+  if (!subId) { toast('err', 'Subscription ID required.'); return; }
+
+  setLoading('btn-cancel', true);
+  try {
+    const subAddr  = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgCancelSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
+    const txBody   = await buildTx('cancel_subscription', TYPE_URLS['cancel_subscription'], msgBytes, 10000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `cancel failed: ${r.error}`); }
+    else { toast('ok', `Sub #${subId} cancelled.`); log('warn', `cancel_subscription → subId=${subId}`); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'cancel error: ' + e.message); }
+  resetBtn('btn-cancel', 'Cancel Sub');
+}
+
+async function submitPause() {
+  if (!requireWallet()) return;
+  const subId = parseInt(document.getElementById('pause-sub-id').value) || 0;
+  if (!subId) { toast('err', 'Subscription ID required.'); return; }
+
+  setLoading('btn-pause', true);
+  try {
+    const subAddr  = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgPauseSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
+    const txBody   = await buildTx('pause_subscription', TYPE_URLS['pause_subscription'], msgBytes, 10000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `pause failed: ${r.error}`); }
+    else { toast('ok', `Sub #${subId} paused.`); log('ok', `pause_subscription → subId=${subId}`); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'pause error: ' + e.message); }
+  resetBtn('btn-pause', 'Pause');
+}
+
+async function submitResume() {
+  if (!requireWallet()) return;
+  const subId = parseInt(document.getElementById('pause-sub-id').value) || 0;
+  if (!subId) { toast('err', 'Subscription ID required.'); return; }
+
+  setLoading('btn-resume', true);
+  try {
+    const subAddr  = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgResumeSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
+    const txBody   = await buildTx('resume_subscription', TYPE_URLS['resume_subscription'], msgBytes, 10000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `resume failed: ${r.error}`); }
+    else { toast('ok', `Sub #${subId} resumed.`); log('ok', `resume_subscription → subId=${subId}`); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'resume error: ' + e.message); }
+  resetBtn('btn-resume', 'Resume');
+}
+
+async function submitUpdatePlan() {
+  if (!requireWallet()) return;
+  const planId = parseInt(document.getElementById('upd-plan-id').value) || 0;
+  const name   = document.getElementById('upd-name').value.trim();
+  const price  = parseInt(document.getElementById('upd-price').value) || 0;
+  const desc   = document.getElementById('upd-desc').value.trim();
+  if (!planId) { toast('err', 'Plan ID required.'); return; }
+
+  setLoading('btn-update', true);
+  try {
+    const creatorAddr = await pubKeyToAddress(wallet.pubKey);
+    const msgBytes = encodeMsgUpdatePlan({ creatorAddress: creatorAddr, planId, name, newPrice: price, description: desc });
+    const txBody   = await buildTx('update_plan', TYPE_URLS['update_plan'], msgBytes, 20000);
+    const r = await submitTx(txBody);
+    if (r.error) { toast('err', r.error); log('err', `update_plan failed: ${r.error}`); }
+    else { toast('ok', `Plan #${planId} updated.`); log('ok', `update_plan → planId=${planId}`); setTimeout(refreshState, 3000); }
+  } catch(e) { toast('err', e.message); log('err', 'update_plan error: ' + e.message); }
+  resetBtn('btn-update', 'Update Plan →');
+}
+
+// ── Quick table actions ───────────────────────────────────────────────────
+function quickSubscribe(planId) {
+  document.getElementById('sub-plan-id').value = planId;
+  setTab('submit');
+  toast('info', `Plan #${planId} selected. Hit Subscribe.`);
+}
+function prefillUpdate(planId) {
+  const p = plans.find(p => p.id === planId);
+  document.getElementById('upd-plan-id').value = planId;
+  if (p) { document.getElementById('upd-name').value = p.name; document.getElementById('upd-desc').value = p.description; }
+  setTab('submit');
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────
+function setTab(name) {
+  const names = ['plans','subscriptions','submit','log'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
+  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+function toggleCreateForm() {
+  const f = document.getElementById('create-plan-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
 }
 
 // ── Rendering ─────────────────────────────────────────────────────────────
 function renderAll() { renderStats(); renderPlans(); renderSubs(); }
 
 function renderStats() {
-  document.getElementById('stat-plans').textContent = plans.filter(p => p.active).length;
-  document.getElementById('stat-subs').textContent  = subs.filter(s => s.status==='active'||s.status==='trial').length;
-  const billed = subs.reduce((a,s) => a+s.billingCycle, 0);
-  document.getElementById('stat-billed').textContent = (billed*5).toFixed(0)+' SBX';
-  document.getElementById('plans-count').textContent = plans.filter(p=>p.active).length+' ACTIVE';
-  document.getElementById('subs-count').textContent  = subs.length+' RECORDS';
+  const activePlans = plans.filter(p => p.active).length;
+  const activeSubs  = subs.filter(s => s.status === 'active' || s.status === 'trial').length;
+  document.getElementById('stat-plans').textContent = activePlans;
+  document.getElementById('stat-plans-delta').textContent = `${plans.length} total`;
+  document.getElementById('stat-subs').textContent = activeSubs;
+  document.getElementById('stat-subs-delta').textContent = `${subs.length} total`;
+  document.getElementById('plans-count').textContent = activePlans + ' ACTIVE';
+  document.getElementById('subs-count').textContent  = subs.length + ' RECORDS';
 }
 
 function renderPlans() {
-  const grid = document.getElementById('plans-grid');
+  const grid  = document.getElementById('plans-grid');
   const empty = document.getElementById('plans-empty');
   if (!plans.length) { grid.style.display='none'; empty.style.display='block'; return; }
-  grid.style.display='grid'; empty.style.display='none';
+  grid.style.display = 'grid'; empty.style.display = 'none';
   grid.innerHTML = plans.map(p => `
-    <div class="plan-card ${p.active?'active-plan':''}">
+    <div class="plan-card ${p.active ? 'active-plan' : ''}">
       <div class="plan-header">
         <div class="plan-name">${esc(p.name)}</div>
-        <span class="plan-badge ${p.active?'badge-active':'badge-inactive'}">${p.active?'active':'inactive'}</span>
+        <span class="plan-badge ${p.active ? 'badge-active' : 'badge-inactive'}">${p.active ? 'active' : 'inactive'}</span>
       </div>
       <div class="plan-price">${fmtSBX(p.price)}<span> SBX / ${p.intervalDays}d</span></div>
-      <div class="plan-desc">${esc(p.description)}</div>
+      <div class="plan-desc">${esc(p.description) || '<span style="color:var(--muted)">No description</span>'}</div>
       <div class="plan-meta">
         <div class="meta-item"><strong>${p.activeSubs}</strong>subscribers</div>
-        <div class="meta-item"><strong>${p.maxSubscribers>0?p.maxSubscribers:'∞'}</strong>cap</div>
-        <div class="meta-item"><strong>${p.trialDays>0?p.trialDays+'d':'none'}</strong>trial</div>
+        <div class="meta-item"><strong>${p.maxSubscribers > 0 ? p.maxSubscribers : '∞'}</strong>cap</div>
+        <div class="meta-item"><strong>${p.trialDays > 0 ? p.trialDays + 'd' : 'none'}</strong>trial</div>
         <div class="meta-item"><strong>#${p.id}</strong>plan id</div>
       </div>
       <div class="plan-actions">
@@ -1333,200 +1111,74 @@ function renderPlans() {
 
 function renderSubs() {
   const tbody = document.getElementById('subs-tbody');
-  if (!subs.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">No subscriptions yet.</td></tr>'; return; }
+  if (!subs.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">No subscriptions found for this wallet.</td></tr>';
+    return;
+  }
   tbody.innerHTML = subs.map(s => `
     <tr>
       <td class="id">#${s.id}</td>
-      <td class="name">${esc(s.planName||'Plan #'+s.planId)}</td>
-      <td class="mono" style="font-size:10px;">${s.subscriberAddress.slice(0,10)}…</td>
+      <td class="name">${esc(s.planName || 'Plan #' + s.planId)}</td>
+      <td class="mono" style="font-size:10px;">${typeof s.subscriberAddress === 'string' ? s.subscriberAddress.slice(0,10) : bytesToHex(s.subscriberAddress).slice(0,10)}…</td>
       <td><span class="plan-badge badge-${s.status}">${s.status}</span></td>
       <td>${s.billingCycle}</td>
       <td class="mono" style="font-size:11px;">#${s.nextBillingHeight}</td>
       <td><div style="display:flex;gap:6px;">
-        ${s.status==='active'||s.status==='trial'?`<button class="btn btn-ghost btn-sm" onclick="quickPause(${s.id})">Pause</button>`:''}
-        ${s.status==='paused'?`<button class="btn btn-ghost btn-sm" onclick="quickResume(${s.id})">Resume</button>`:''}
-        ${s.status!=='cancelled'?`<button class="btn btn-danger btn-sm" onclick="quickCancel(${s.id})">Cancel</button>`:''}
-        ${(s.status==='active'||s.status==='trial')&&blockHeight>=s.nextBillingHeight?`<button class="btn btn-primary btn-sm" onclick="quickBill(${s.id})">Bill</button>`:''}
+        ${s.status==='active'||s.status==='trial' ? `<button class="btn btn-ghost btn-sm" onclick="document.getElementById('pause-sub-id').value=${s.id};setTab('submit')">Pause</button>` : ''}
+        ${s.status==='paused' ? `<button class="btn btn-ghost btn-sm" onclick="document.getElementById('pause-sub-id').value=${s.id};setTab('submit')">Resume</button>` : ''}
+        ${s.status!=='cancelled' ? `<button class="btn btn-danger btn-sm" onclick="document.getElementById('cancel-sub-id').value=${s.id};setTab('submit')">Cancel</button>` : ''}
       </div></td>
     </tr>`).join('');
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────
-function setTab(name) {
-  const names = ['plans','subscriptions','submit','log'];
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
-  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-}
-
-// ── Form Helpers ──────────────────────────────────────────────────────────
-function toggleCreateForm() {
-  const f = document.getElementById('create-plan-form');
-  f.style.display = f.style.display==='none' ? 'block' : 'none';
-}
-
-// ── Submit Handlers ───────────────────────────────────────────────────────
-// Each handler:
-//  DEMO_MODE → mutate local state, log action
-//  LIVE mode → encode msgBytes with protoEncode, call buildTx (signs with BLS),
-//              submit to /v1/tx using the plugin type body format:
-//              { type, msgTypeUrl, msgBytes (hex), fee, time, networkID, chainID, signature }
-
-async function submitCreatePlan() {
-  const creatorHex = document.getElementById('cp-creator').value.trim();
-  const name       = document.getElementById('cp-name').value.trim();
-  const desc       = document.getElementById('cp-desc').value.trim();
-  const price      = parseInt(document.getElementById('cp-price').value)    || 0;
-  const interval   = parseInt(document.getElementById('cp-interval').value) || 0;
-  const trial      = parseInt(document.getElementById('cp-trial').value)    || 0;
-  const maxSubs    = parseInt(document.getElementById('cp-maxsubs').value)  || 0;
-
-  if (!creatorHex || !name || !price || !interval) { toast('err', 'Creator address, name, price, and interval are required.'); return; }
-
-  if (DEMO_MODE) {
-    plans.push({ id: plans.length+1, name, description: desc, price, intervalDays: interval,
-      trialDays: trial, maxSubscribers: maxSubs, activeSubs: 0, active: true, createdHeight: blockHeight });
-    renderAll(); log('ok', `create_plan → "${name}" · ${fmtSBX(price)} SBX / ${interval}d`);
-    toast('ok', `Plan "${name}" deployed.`); toggleCreateForm(); return;
-  }
-
-  if (!wallet) { toast('err', 'Load wallet first (keystore → loadWallet).'); return; }
-  const creatorAddr = await pubKeyToAddress(wallet.pubKey); // SHA256(pubKey).slice(0,20)
-  const msgBytes = encodeMsgCreatePlan({
-    creatorAddress: creatorAddr, name, description: desc,
-    price, intervalDays: interval, trialDays: trial, maxSubscribers: maxSubs,
-  });
-  const txBody = await buildTx('create_plan', TYPE_URLS['create_plan'], msgBytes, wallet, 50000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); log('err', `create_plan failed: ${r.error}`); return; }
-  toast('ok', `Plan submitted.`); log('ok', `create_plan submitted`); toggleCreateForm();
-}
-
-async function submitSubscribe() {
-  const addrHex = document.getElementById('sub-addr').value.trim();
-  const planId  = parseInt(document.getElementById('sub-plan-id').value) || 0;
-  if (!addrHex || !planId) { toast('err', 'Subscriber address and plan ID required.'); return; }
-  if (DEMO_MODE) { log('info', `subscribe → planId=${planId}`); toast('info', 'subscribe (demo)'); return; }
-  if (!wallet) { toast('err', 'Load wallet first.'); return; }
-  const subAddr  = await pubKeyToAddress(wallet.pubKey);
-  const msgBytes = encodeMsgSubscribe({ subscriberAddress: subAddr, planId });
-  const txBody   = await buildTx('subscribe', TYPE_URLS['subscribe'], msgBytes, wallet, 10000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); return; }
-  toast('ok', 'Subscribe submitted.'); log('ok', `subscribe planId=${planId}`);
-}
-
-async function submitProcessBilling() {
-  const procHex = document.getElementById('proc-addr').value.trim();
-  const subId   = parseInt(document.getElementById('proc-sub-id').value) || 0;
-  if (!procHex || !subId) { toast('err', 'Processor address and subscription ID required.'); return; }
-  if (DEMO_MODE) { log('info', `process_billing → subId=${subId}`); toast('info', 'process_billing (demo)'); return; }
-  if (!wallet) { toast('err', 'Load wallet first.'); return; }
-  const procAddr = await pubKeyToAddress(wallet.pubKey);
-  const msgBytes = encodeMsgProcessBilling({ processorAddress: procAddr, subscriptionId: subId });
-  const txBody   = await buildTx('process_billing', TYPE_URLS['process_billing'], msgBytes, wallet, 5000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); return; }
-  toast('ok', 'Billing processed.'); log('ok', `process_billing subId=${subId}`);
-}
-
-async function submitCancel() {
-  const addrHex = document.getElementById('cancel-addr').value.trim();
-  const subId   = parseInt(document.getElementById('cancel-sub-id').value) || 0;
-  if (!addrHex || !subId) { toast('err', 'Subscriber address and subscription ID required.'); return; }
-  if (DEMO_MODE) { quickCancel(subId); return; }
-  if (!wallet) { toast('err', 'Load wallet first.'); return; }
-  const subAddr  = await pubKeyToAddress(wallet.pubKey);
-  const msgBytes = encodeMsgCancelSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
-  const txBody   = await buildTx('cancel_subscription', TYPE_URLS['cancel_subscription'], msgBytes, wallet, 10000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); return; }
-  toast('ok', 'Cancellation submitted.'); log('warn', `cancel_subscription subId=${subId}`);
-}
-
-async function submitPause() {
-  const addrHex = document.getElementById('pause-addr').value.trim();
-  const subId   = parseInt(document.getElementById('pause-sub-id').value) || 0;
-  if (!addrHex || !subId) { toast('err', 'Address and subscription ID required.'); return; }
-  if (DEMO_MODE) { quickPause(subId); return; }
-  if (!wallet) { toast('err', 'Load wallet first.'); return; }
-  const subAddr  = await pubKeyToAddress(wallet.pubKey);
-  const msgBytes = encodeMsgPauseSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
-  const txBody   = await buildTx('pause_subscription', TYPE_URLS['pause_subscription'], msgBytes, wallet, 10000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); return; }
-  toast('ok', 'Pause submitted.'); log('ok', `pause_subscription subId=${subId}`);
-}
-
-async function submitResume() {
-  const addrHex = document.getElementById('pause-addr').value.trim();
-  const subId   = parseInt(document.getElementById('pause-sub-id').value) || 0;
-  if (!addrHex || !subId) { toast('err', 'Address and subscription ID required.'); return; }
-  if (DEMO_MODE) { quickResume(subId); return; }
-  if (!wallet) { toast('err', 'Load wallet first.'); return; }
-  const subAddr  = await pubKeyToAddress(wallet.pubKey);
-  const msgBytes = encodeMsgResumeSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
-  const txBody   = await buildTx('resume_subscription', TYPE_URLS['resume_subscription'], msgBytes, wallet, 10000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); return; }
-  toast('ok', 'Resume submitted.'); log('ok', `resume_subscription subId=${subId}`);
-}
-
-async function submitUpdatePlan() {
-  const creatorHex = document.getElementById('upd-creator').value.trim();
-  const planId     = parseInt(document.getElementById('upd-plan-id').value)  || 0;
-  const name       = document.getElementById('upd-name').value.trim();
-  const price      = parseInt(document.getElementById('upd-price').value)    || 0;
-  const desc       = document.getElementById('upd-desc').value.trim();
-  if (!creatorHex || !planId) { toast('err', 'Creator address and plan ID required.'); return; }
-
-  if (DEMO_MODE) {
-    const p = plans.find(p => p.id===planId);
-    if (!p) { toast('err', 'Plan not found.'); return; }
-    if (name) p.name=name; if (price) p.price=price; if (desc) p.description=desc;
-    renderAll(); log('ok', `update_plan #${planId}`); toast('ok', `Plan #${planId} updated.`); return;
-  }
-
-  if (!wallet) { toast('err', 'Load wallet first.'); return; }
-  const creatorAddr = await pubKeyToAddress(wallet.pubKey);
-  const msgBytes = encodeMsgUpdatePlan({ creatorAddress: creatorAddr, planId, name, newPrice: price, description: desc });
-  const txBody   = await buildTx('update_plan', TYPE_URLS['update_plan'], msgBytes, wallet, 20000);
-  const r = await submitTx(txBody);
-  if (r.error) { toast('err', r.error); return; }
-  toast('ok', `Plan #${planId} updated.`); log('ok', `update_plan #${planId}`);
-}
-
-// ── Quick Table Actions ───────────────────────────────────────────────────
-function quickSubscribe(planId) { document.getElementById('sub-plan-id').value=planId; setTab('submit'); toast('info', `Fill in subscriber address for plan #${planId}.`); }
-function quickPause(subId)  { if(!DEMO_MODE)return; const s=subs.find(s=>s.id===subId); if(s){s.status='paused';renderAll();log('ok',`pause_subscription #${subId}`);toast('ok',`Sub #${subId} paused.`);} }
-function quickResume(subId) { if(!DEMO_MODE)return; const s=subs.find(s=>s.id===subId); if(s){s.status='active';s.nextBillingHeight=blockHeight+108000;renderAll();log('ok',`resume_subscription #${subId}`);toast('ok',`Sub #${subId} resumed.`);} }
-function quickCancel(subId) {
-  if(!DEMO_MODE)return;
-  const s=subs.find(s=>s.id===subId);
-  if(s){ s.status='cancelled'; const p=plans.find(p=>p.id===s.planId); if(p&&p.activeSubs>0)p.activeSubs--; renderAll(); log('warn',`cancel_subscription #${subId}`); toast('ok',`Sub #${subId} cancelled.`); }
-}
-function quickBill(subId)  { if(!DEMO_MODE)return; const s=subs.find(s=>s.id===subId); if(s){s.billingCycle++;s.nextBillingHeight=blockHeight+108000;renderAll();log('ok',`process_billing #${subId} · cycle ${s.billingCycle} · +1 SBX reward`);toast('ok',`Billing processed for sub #${subId}.`);} }
-function prefillUpdate(planId) { const p=plans.find(pl=>pl.id===planId); if(!p)return; document.getElementById('upd-plan-id').value=planId; document.getElementById('upd-name').value=p.name; document.getElementById('upd-desc').value=p.description; document.getElementById('upd-price').value=0; setTab('submit'); }
-
 // ── Utilities ─────────────────────────────────────────────────────────────
-function fmtSBX(uSBX) { return (uSBX/1_000_000).toFixed(uSBX%1_000_000===0?0:2); }
+function fmtSBX(uSBX) { return (uSBX / 1_000_000).toFixed(uSBX % 1_000_000 === 0 ? 0 : 2); }
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function log(type, msg) {
-  const body=document.getElementById('log-body');
-  const now=new Date().toTimeString().slice(0,8);
-  const line=document.createElement('div');
-  line.className='log-line';
-  line.innerHTML=`<span class="log-time">${now}</span><span class="log-${type}">${esc(msg)}</span>`;
-  body.appendChild(line); body.scrollTop=body.scrollHeight;
+  const body = document.getElementById('log-body');
+  const now  = new Date().toTimeString().slice(0,8);
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `<span class="log-time">${now}</span><span class="log-${type}">${esc(msg)}</span>`;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
 }
 function toast(type, msg) {
-  const area=document.getElementById('toast-area');
-  const t=document.createElement('div');
-  t.className=`toast ${type}`; t.textContent=msg; area.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3500);
+  const area = document.getElementById('toast-area');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`; t.textContent = msg; area.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(), 300); }, 3500);
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────
+async function init() {
+  log('info', 'Connecting to node at localhost:50002…');
+
+  // Poll height first to check node is live
+  await pollHeight();
+
+  if (nodeOnline) {
+    log('ok', `Node online. Block height: ${blockHeight}`);
+    // Auto-load validator wallet
+    log('info', 'Loading validator wallet…');
+    const ok = await loadWallet(VALIDATOR_ADDRESS, VALIDATOR_PASSWORD);
+    if (ok) {
+      await fetchChainState();
+    }
+  } else {
+    log('err', 'Node unreachable. Start canopy and refresh.');
+    renderAll();
+  }
+
+  // Poll every 10s
+  setInterval(async () => {
+    await pollHeight();
+    if (nodeOnline && wallet) {
+      await fetchChainState();
+    }
+  }, 10000);
+}
+
 init();
 </script>
 </body>
