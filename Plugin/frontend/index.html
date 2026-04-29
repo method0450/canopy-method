@@ -591,12 +591,14 @@ function encodeAny(typeUrl, valueBytes) {
     { field: 2, type: 'bytes',  value: valueBytes },
   ]);
 }
-function buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time, memo, networkID, chainID }) {
+function buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time, createdHeight, memo, networkID, chainID }) {
   const txTime = typeof time === 'bigint' ? time : BigInt(time);
   const anyBytes = encodeAny(msgTypeUrl, msgBytes);
   const fields = [
     { field: 1, type: 'string', value: type },
     { field: 2, type: 'bytes',  value: anyBytes },
+    // field 3 = signature — omitted
+    { field: 4, type: 'varint', value: createdHeight || 0 },
     { field: 5, type: 'varint', value: txTime },
     { field: 6, type: 'varint', value: fee },
     { field: 8, type: 'varint', value: networkID || 1 },
@@ -621,12 +623,15 @@ async function pubKeyToAddress(pubKeyBytes) {
 async function buildTx(type, msgTypeUrl, msgBytes, fee = 10000, memo = '') {
   const bls = await loadBLS();
   const txTime = BigInt(Date.now() * 1000);
-  const signBytes = buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time: txTime, memo, networkID: NETWORK_ID, chainID: CHAIN_ID });
+  const createdHeight = blockHeight || 0;
+  const signBytes = buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time: txTime, createdHeight, memo, networkID: NETWORK_ID, chainID: CHAIN_ID });
   const sigBytes = await bls.sign(signBytes, wallet.privKey);
   return {
     type, msgTypeUrl,
     msgBytes:  bytesToHex(msgBytes),
-    fee, time: Number(txTime), memo: memo || '',
+    fee, time: Number(txTime),
+    createdHeight,
+    memo: '',
     networkID: NETWORK_ID, chainID: CHAIN_ID,
     signature: {
       publicKey: bytesToHex(wallet.pubKey),
