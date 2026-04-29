@@ -1,16 +1,50 @@
 {
-  "chainId": 1,
-  "name": "canopy",
-  "symbol": "CNPY",
-  "website": "https://canopynetwork.org",
-  "logoURI": "https://",
-  "bannerURI": "https://",
-  "explorerLogoURI": "https://",
-  "walletLogoURI": "https://",
-  "color1Hex": "#2c9b5a",
-  "color2Hex": "#16502e",
-  "description": "Canopy is a recursive, progressive-sovereignty framework for blockchains",
-  "consensusPreset": 1,
-  "initialMintPerBlock": 80000000,
-  "blocksPerHalvening": 3150000
+  "id": 1,
+  "name": "Subex",
+  "symbol": "SBX",
+  "description": "Programmable subscription infrastructure on-chain. Recurring payments, tier management, and billing automation without platform extraction.",
+  "url": "https://github.com/method0450/canopy-method",
+  "module": "github.com/method0450/canopy-method/plugin/go",
+  "pluginName": "subex_plugin",
+  "pluginVersion": 1,
+  "initialSupply": 1000000000000000,
+  "maxSupply": 21000000000000000,
+  "decimals": 6,
+  "minFee": 5000,
+  "blockReward": 500000,
+  "billingReward": 1000000,
+  "blocksPerDay": 3600,
+  "supportedTransactions": [
+    "send",
+    "create_plan",
+    "subscribe",
+    "process_billing",
+    "cancel_subscription",
+    "pause_subscription",
+    "resume_subscription",
+    "update_plan"
+  ],
+  "transactionTypeUrls": {
+    "send":                  "type.googleapis.com/types.MessageSend",
+    "create_plan":           "type.googleapis.com/types.MessageCreatePlan",
+    "subscribe":             "type.googleapis.com/types.MessageSubscribe",
+    "process_billing":       "type.googleapis.com/types.MessageProcessBilling",
+    "cancel_subscription":   "type.googleapis.com/types.MessageCancelSubscription",
+    "pause_subscription":    "type.googleapis.com/types.MessagePauseSubscription",
+    "resume_subscription":   "type.googleapis.com/types.MessageResumeSubscription",
+    "update_plan":           "type.googleapis.com/types.MessageUpdatePlan"
+  },
+  "feeParams": {
+    "sendFee":           10000,
+    "createPlanFee":     50000,
+    "subscribeFee":      10000,
+    "processBillingFee": 5000,
+    "cancelFee":         10000,
+    "updatePlanFee":     20000,
+    "pauseFee":          10000
+  },
+  "rpc": {
+    "queryPort": 50002,
+    "adminPort":  50003
+  }
 }
