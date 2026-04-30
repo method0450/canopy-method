@@ -2,6 +2,7 @@ package contract
 
 import (
 	"bytes"
+	"fmt"
 	"encoding/binary"
 	"log"
 	"math/rand"
@@ -200,7 +201,7 @@ func (c *Contract) CheckTx(request *PluginCheckRequest) *PluginCheckResponse {
 	}
 
 	// Dispatch to per-type fee check then message check
-	msg, err := FromAny(request.Tx.Msg)
+	msg, err := msgFromAny(request.Tx.Msg)
 	if err != nil {
 		return &PluginCheckResponse{Error: err}
 	}
@@ -354,7 +355,7 @@ func (c *Contract) CheckUpdatePlan(msg *MessageUpdatePlan) *PluginCheckResponse 
 // ─── Lifecycle: DeliverTx ─────────────────────────────────────────────────────
 
 func (c *Contract) DeliverTx(request *PluginDeliverRequest) *PluginDeliverResponse {
-	msg, err := FromAny(request.Tx.Msg)
+	msg, err := msgFromAny(request.Tx.Msg)
 	if err != nil {
 		return &PluginDeliverResponse{Error: err}
 	}
@@ -1384,4 +1385,36 @@ func (c *Contract) DeliverUpdatePlan(msg *MessageUpdatePlan, fee uint64) *Plugin
 
 func (c *Contract) EndBlock(_ *PluginEndRequest) *PluginEndResponse {
 	return &PluginEndResponse{}
+}
+
+// msgFromAny() directly unmarshals plugin message types by TypeUrl without relying on global proto registry
+func msgFromAny(a *anypb.Any) (proto.Message, *PluginError) {
+if a == nil {
+return nil, ErrFromAny(fmt.Errorf("nil any"))
+}
+var msg proto.Message
+switch a.TypeUrl {
+case "type.googleapis.com/types.MessageSend":
+msg = new(MessageSend)
+case "type.googleapis.com/types.MessageCreatePlan":
+msg = new(MessageCreatePlan)
+case "type.googleapis.com/types.MessageSubscribe":
+msg = new(MessageSubscribe)
+case "type.googleapis.com/types.MessageProcessBilling":
+msg = new(MessageProcessBilling)
+case "type.googleapis.com/types.MessageCancelSubscription":
+msg = new(MessageCancelSubscription)
+case "type.googleapis.com/types.MessagePauseSubscription":
+msg = new(MessagePauseSubscription)
+case "type.googleapis.com/types.MessageResumeSubscription":
+msg = new(MessageResumeSubscription)
+case "type.googleapis.com/types.MessageUpdatePlan":
+msg = new(MessageUpdatePlan)
+default:
+return nil, ErrFromAny(fmt.Errorf("unknown type url: %s", a.TypeUrl))
+}
+if err := proto.Unmarshal(a.Value, msg); err != nil {
+return nil, ErrFromAny(err)
+}
+return msg, nil
 }

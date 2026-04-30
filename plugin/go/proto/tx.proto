@@ -1,6 +1,6 @@
 syntax = "proto3";
 package types;
-// CORRECT module path matching go.mod: module github.com/canopy-network/go-plugin
+// CORRECT module path matching go.mod: module github.com/method0450/canopy-method/plugin/go
 option go_package = "github.com/method0450/canopy-method/plugin/go/contract";
 
 import "google/protobuf/any.proto";
@@ -140,20 +140,3 @@ message SubCounter {
 }
 
 // ─── Account / Pool (from template — kept for completeness) ──────────────────
-
-message Account {
-  bytes  address = 1;
-  uint64 amount  = 2;
-}
-
-message Pool {
-  uint64 id     = 1;
-  uint64 amount = 2;
-}
-
-
-
-
-
-
-
