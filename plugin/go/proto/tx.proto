@@ -1,7 +1,7 @@
 syntax = "proto3";
 package types;
 // CORRECT module path matching go.mod: module github.com/method0450/canopy-method/plugin/go
-option go_package = "github.com/method0450/canopy-method/plugin/go/contract";
+option go_package = "github.com/canopy-network/go-plugin/contract";
 
 import "google/protobuf/any.proto";
 
@@ -140,3 +140,65 @@ message SubCounter {
 }
 
 // ─── Account / Pool (from template — kept for completeness) ──────────────────
+
+// ─── Trust Staking — onchain credibility wagering with consequences ──────────
+
+message MessageStakeTrust {
+  bytes  staker_address = 1; // @gotags: json:"stakerAddress"
+  bytes  target_address = 2; // @gotags: json:"targetAddress"
+  uint64 amount          = 3;
+}
+
+message MessageProposeSlash {
+  bytes  initiator_address = 1; // @gotags: json:"initiatorAddress"
+  bytes  target_address    = 2; // @gotags: json:"targetAddress"
+  string reason             = 3;
+}
+
+message MessageVoteSlash {
+  bytes voter_address = 1; // @gotags: json:"voterAddress"
+  bytes proposal_id   = 2; // @gotags: json:"proposalId"
+  bool  approve        = 3;
+}
+
+message MessageResolveSlash {
+  bytes resolver_address = 1; // @gotags: json:"resolverAddress"
+  bytes proposal_id       = 2; // @gotags: json:"proposalId"
+}
+
+message MessageWithdrawStake {
+  bytes staker_address = 1; // @gotags: json:"stakerAddress"
+  bytes target_address = 2; // @gotags: json:"targetAddress"
+}
+
+message TrustStake {
+  bytes  staker_address             = 1; // @gotags: json:"stakerAddress"
+  bytes  target_address             = 2; // @gotags: json:"targetAddress"
+  uint64 amount                      = 3;
+  uint64 status                      = 4;
+  uint64 created_height              = 5; // @gotags: json:"createdHeight"
+  uint64 withdraw_requested_height   = 6; // @gotags: json:"withdrawRequestedHeight"
+}
+
+message SlashProposal {
+  bytes           proposal_id            = 1; // @gotags: json:"proposalId"
+  bytes           target_address         = 2; // @gotags: json:"targetAddress"
+  bytes           initiator_address      = 3; // @gotags: json:"initiatorAddress"
+  string          reason                  = 4;
+  uint64          votes_for               = 5; // @gotags: json:"votesFor"
+  uint64          votes_against           = 6; // @gotags: json:"votesAgainst"
+  repeated bytes  voters                  = 7;
+  uint64          status                  = 8;
+  uint64          voting_deadline_height  = 9;  // @gotags: json:"votingDeadlineHeight"
+  uint64          created_height          = 10; // @gotags: json:"createdHeight"
+}
+
+message StakerIndex {
+  repeated bytes target_addresses = 1; // @gotags: json:"targetAddresses"
+}
+
+message SlashProposalCreatedEvent {
+  bytes proposal_id       = 1; // @gotags: json:"proposalId"
+  bytes target_address    = 2; // @gotags: json:"targetAddress"
+  bytes initiator_address = 3; // @gotags: json:"initiatorAddress"
+}

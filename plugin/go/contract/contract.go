@@ -2,8 +2,8 @@ package contract
 
 import (
 	"bytes"
-	"fmt"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"math/rand"
 
@@ -29,6 +29,11 @@ var ContractConfig = &PluginConfig{
 		"pause_subscription",
 		"resume_subscription",
 		"update_plan",
+		"stake_trust",
+		"propose_slash",
+		"vote_slash",
+		"resolve_slash",
+		"withdraw_stake",
 	},
 	TransactionTypeUrls: []string{
 		"type.googleapis.com/types.MessageSend",
@@ -39,8 +44,15 @@ var ContractConfig = &PluginConfig{
 		"type.googleapis.com/types.MessagePauseSubscription",
 		"type.googleapis.com/types.MessageResumeSubscription",
 		"type.googleapis.com/types.MessageUpdatePlan",
+		"type.googleapis.com/types.MessageStakeTrust",
+		"type.googleapis.com/types.MessageProposeSlash",
+		"type.googleapis.com/types.MessageVoteSlash",
+		"type.googleapis.com/types.MessageResolveSlash",
+		"type.googleapis.com/types.MessageWithdrawStake",
 	},
-	EventTypeUrls: nil,
+	EventTypeUrls: []string{
+		"type.googleapis.com/types.SlashProposalCreatedEvent",
+	},
 }
 
 // init registers all protobuf file descriptors with the FSM config.
@@ -87,9 +99,9 @@ type Contract struct {
 //   []byte{0x13}  SubCounter
 
 var (
-	accountPrefix     = []byte{1}    // matches template
-	poolPrefix        = []byte{2}    // matches template
-	paramsPrefix      = []byte{7}    // matches template
+	accountPrefix     = []byte{1} // matches template
+	poolPrefix        = []byte{2} // matches template
+	paramsPrefix      = []byte{7} // matches template
 	planPrefix        = []byte{0x10}
 	planCounterPrefix = []byte{0x11}
 	subPrefix         = []byte{0x12}
@@ -247,6 +259,16 @@ func (c *Contract) CheckTx(request *PluginCheckRequest) *PluginCheckResponse {
 			return &PluginCheckResponse{Error: ErrTxFeeBelowStateLimit()}
 		}
 		return c.CheckUpdatePlan(x)
+	case *MessageStakeTrust:
+		return c.CheckMessageStakeTrust(x)
+	case *MessageProposeSlash:
+		return c.CheckMessageProposeSlash(x)
+	case *MessageVoteSlash:
+		return c.CheckMessageVoteSlash(x)
+	case *MessageResolveSlash:
+		return c.CheckMessageResolveSlash(x)
+	case *MessageWithdrawStake:
+		return c.CheckMessageWithdrawStake(x)
 	default:
 		return &PluginCheckResponse{Error: ErrInvalidMessageCast()}
 	}
@@ -376,6 +398,16 @@ func (c *Contract) DeliverTx(request *PluginDeliverRequest) *PluginDeliverRespon
 		return c.DeliverResumeSubscription(x, request.Tx.Fee)
 	case *MessageUpdatePlan:
 		return c.DeliverUpdatePlan(x, request.Tx.Fee)
+	case *MessageStakeTrust:
+		return c.DeliverMessageStakeTrust(x, request.Tx.Fee)
+	case *MessageProposeSlash:
+		return c.DeliverMessageProposeSlash(x, request.Tx.Fee)
+	case *MessageVoteSlash:
+		return c.DeliverMessageVoteSlash(x, request.Tx.Fee)
+	case *MessageResolveSlash:
+		return c.DeliverMessageResolveSlash(x, request.Tx.Fee)
+	case *MessageWithdrawStake:
+		return c.DeliverMessageWithdrawStake(x, request.Tx.Fee)
 	default:
 		return &PluginDeliverResponse{Error: ErrInvalidMessageCast()}
 	}
@@ -387,10 +419,10 @@ func (c *Contract) DeliverTx(request *PluginDeliverRequest) *PluginDeliverRespon
 func (c *Contract) DeliverMessageSend(msg *MessageSend, fee uint64) *PluginDeliverResponse {
 	log.Printf("DeliverMessageSend: from=%x to=%x amount=%d fee=%d", msg.FromAddress, msg.ToAddress, msg.Amount, fee)
 	var (
-		fromKey, toKey, feePoolKey             = KeyForAccount(msg.FromAddress), KeyForAccount(msg.ToAddress), KeyForFeePool(c.Config.ChainId)
-		fromQueryId, toQueryId, feeQueryId     = rand.Uint64(), rand.Uint64(), rand.Uint64()
-		from, to, feePool                      = new(Account), new(Account), new(Pool)
-		fromBytes, toBytes, feePoolBytes       []byte
+		fromKey, toKey, feePoolKey         = KeyForAccount(msg.FromAddress), KeyForAccount(msg.ToAddress), KeyForFeePool(c.Config.ChainId)
+		fromQueryId, toQueryId, feeQueryId = rand.Uint64(), rand.Uint64(), rand.Uint64()
+		from, to, feePool                  = new(Account), new(Account), new(Pool)
+		fromBytes, toBytes, feePoolBytes   []byte
 	)
 
 	response, err := c.plugin.StateRead(c, &PluginStateReadRequest{
@@ -486,12 +518,12 @@ func (c *Contract) DeliverCreatePlan(msg *MessageCreatePlan, fee uint64) *Plugin
 	log.Printf("DeliverCreatePlan: creator=%x name=%s fee=%d", msg.CreatorAddress, msg.Name, fee)
 
 	var (
-		counterQId  = rand.Uint64()
-		creatorQId  = rand.Uint64()
-		feeQId      = rand.Uint64()
-		counter     = new(PlanCounter)
-		creatorAcc  = new(Account)
-		feePool     = new(Pool)
+		counterQId = rand.Uint64()
+		creatorQId = rand.Uint64()
+		feeQId     = rand.Uint64()
+		counter    = new(PlanCounter)
+		creatorAcc = new(Account)
+		feePool    = new(Pool)
 	)
 
 	resp, err := c.plugin.StateRead(c, &PluginStateReadRequest{
@@ -1389,32 +1421,32 @@ func (c *Contract) EndBlock(_ *PluginEndRequest) *PluginEndResponse {
 
 // msgFromAny() directly unmarshals plugin message types by TypeUrl without relying on global proto registry
 func msgFromAny(a *anypb.Any) (proto.Message, *PluginError) {
-if a == nil {
-return nil, ErrFromAny(fmt.Errorf("nil any"))
-}
-var msg proto.Message
-switch a.TypeUrl {
-case "type.googleapis.com/types.MessageSend":
-msg = new(MessageSend)
-case "type.googleapis.com/types.MessageCreatePlan":
-msg = new(MessageCreatePlan)
-case "type.googleapis.com/types.MessageSubscribe":
-msg = new(MessageSubscribe)
-case "type.googleapis.com/types.MessageProcessBilling":
-msg = new(MessageProcessBilling)
-case "type.googleapis.com/types.MessageCancelSubscription":
-msg = new(MessageCancelSubscription)
-case "type.googleapis.com/types.MessagePauseSubscription":
-msg = new(MessagePauseSubscription)
-case "type.googleapis.com/types.MessageResumeSubscription":
-msg = new(MessageResumeSubscription)
-case "type.googleapis.com/types.MessageUpdatePlan":
-msg = new(MessageUpdatePlan)
-default:
-return nil, ErrFromAny(fmt.Errorf("unknown type url: %s", a.TypeUrl))
-}
-if err := proto.Unmarshal(a.Value, msg); err != nil {
-return nil, ErrFromAny(err)
-}
-return msg, nil
+	if a == nil {
+		return nil, ErrFromAny(fmt.Errorf("nil any"))
+	}
+	var msg proto.Message
+	switch a.TypeUrl {
+	case "type.googleapis.com/types.MessageSend":
+		msg = new(MessageSend)
+	case "type.googleapis.com/types.MessageCreatePlan":
+		msg = new(MessageCreatePlan)
+	case "type.googleapis.com/types.MessageSubscribe":
+		msg = new(MessageSubscribe)
+	case "type.googleapis.com/types.MessageProcessBilling":
+		msg = new(MessageProcessBilling)
+	case "type.googleapis.com/types.MessageCancelSubscription":
+		msg = new(MessageCancelSubscription)
+	case "type.googleapis.com/types.MessagePauseSubscription":
+		msg = new(MessagePauseSubscription)
+	case "type.googleapis.com/types.MessageResumeSubscription":
+		msg = new(MessageResumeSubscription)
+	case "type.googleapis.com/types.MessageUpdatePlan":
+		msg = new(MessageUpdatePlan)
+	default:
+		return nil, ErrFromAny(fmt.Errorf("unknown type url: %s", a.TypeUrl))
+	}
+	if err := proto.Unmarshal(a.Value, msg); err != nil {
+		return nil, ErrFromAny(err)
+	}
+	return msg, nil
 }
