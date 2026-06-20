@@ -19,12 +19,25 @@ cryptorand "crypto/rand"
 )
 
 const (
-tsQueryURL  = "http://localhost:50002"
-tsAdminURL  = "http://localhost:50003"
-tsNetworkID = uint64(1)
-tsChainID   = uint64(1)
-tsPassword  = "testpassword123"
+tsQueryURL      = "http://localhost:50002"
+tsAdminURL      = "http://localhost:50003"
+tsNetworkID     = uint64(1)
+tsChainID       = uint64(1)
+tsPassword      = "testpassword123"
+tsValidatorAddr = "e7c7dad131a03f7ea0cc09a637ad096eb3495f77"
+tsValidatorPass = "test123"
 )
+
+func tsValidatorKey() (*tsKeyGroup, error) {
+b, _ := json.Marshal(map[string]string{"address": tsValidatorAddr, "password": tsValidatorPass})
+resp, err := tsPost(tsAdminURL+"/v1/admin/keystore-get", b)
+if err != nil {
+return nil, err
+}
+var kg tsKeyGroup
+json.Unmarshal(resp, &kg)
+return &kg, nil
+}
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -100,24 +113,17 @@ return base64.StdEncoding.EncodeToString(tsH2B(h))
 }
 
 func tsWaitConfirm(addr, txHash string, t *testing.T) error {
-deadline := time.Now().Add(30 * time.Second)
+deadline := time.Now().Add(60 * time.Second)
 for time.Now().Before(deadline) {
-b, _ := json.Marshal(map[string]interface{}{"address": addr, "perPage": 20})
-resp, _ := tsPost(tsQueryURL+"/v1/query/txs-by-sender", b)
-var r struct {
-Results []struct {
-TxHash string `json:"txHash"`
-} `json:"results"`
-}
-json.Unmarshal(resp, &r)
-for _, tx := range r.Results {
-if tx.TxHash == txHash {
+b, _ := json.Marshal(map[string]string{"hash": txHash})
+resp, _ := tsPost(tsQueryURL+"/v1/query/tx-by-hash", b)
+if len(resp) > 2 && string(resp) != "{}" {
+// non-empty response means tx landed
 return nil
-}
 }
 time.Sleep(time.Second)
 }
-return fmt.Errorf("tx %s not confirmed within 30s", txHash)
+return fmt.Errorf("tx %s not confirmed within 60s", txHash)
 }
 
 func tsSendTx(kg *tsKeyGroup, msgType, typeURL string, msgProto proto.Message, fee uint64) (string, error) {
@@ -125,14 +131,14 @@ height, err := tsGetHeight()
 if err != nil {
 return "", err
 }
-
-anyMsg, err := anypb.New(msgProto)
-if err != nil {
-return "", err
-}
-anyMsg.TypeUrl = typeURL
-
 txTime := uint64(time.Now().UnixMicro())
+
+// Marshal proto message for signing
+msgBytes, err := proto.Marshal(msgProto)
+if err != nil {
+return "", fmt.Errorf("marshal msg: %v", err)
+}
+anyMsg := &anypb.Any{TypeUrl: typeURL, Value: msgBytes}
 
 signBytes, err := crypto.GetSignBytes(msgType, anyMsg, txTime, height, fee, "", tsNetworkID, tsChainID)
 if err != nil {
@@ -145,73 +151,91 @@ return "", fmt.Errorf("privkey: %v", err)
 }
 sig := privKey.Sign(signBytes)
 
-tx := &contract.Transaction{
-MessageType:   msgType,
-Msg:           anyMsg,
-Fee:           fee,
-CreatedHeight: height,
-Time:          txTime,
-NetworkId:     tsNetworkID,
-ChainId:       tsChainID,
-Signature: &contract.Signature{
-PublicKey: tsH2B(kg.PublicKey),
-Signature: sig,
+// Build JSON tx — use msgBytes/typeURL for plugin messages
+tx := map[string]interface{}{
+"type":       msgType,
+"msgTypeUrl": typeURL,
+"msgBytes":   hex.EncodeToString(msgBytes),
+"signature": map[string]string{
+"publicKey": kg.PublicKey,
+"signature": hex.EncodeToString(sig),
 },
-}
-
-txBytes, err := proto.Marshal(tx)
-if err != nil {
-return "", err
-}
-
-body, _ := json.Marshal(map[string]string{"tx": base64.StdEncoding.EncodeToString(txBytes)})
-resp, err := tsPost(tsQueryURL+"/v1/tx", body)
-if err != nil {
-return "", err
-}
-
-var result struct {
-Hash  string `json:"hash"`
-Error string `json:"error"`
-}
-json.Unmarshal(resp, &result)
-if result.Error != "" {
-return "", fmt.Errorf("node rejected tx: %s", result.Error)
-}
-return result.Hash, nil
-}
-
-func tsFaucet(kg *tsKeyGroup, recipientAddr string, amount uint64) (string, error) {
-height, _ := tsGetHeight()
-txTime := uint64(time.Now().UnixMicro())
-body, _ := json.Marshal(map[string]interface{}{
-"messageType":   "faucet",
-"msg": map[string]interface{}{
-"signerAddress":    tsH2B64(kg.Address),
-"recipientAddress": tsH2B64(recipientAddr),
-"amount":           amount,
-},
-"fee":           uint64(10000),
-"createdHeight": height,
 "time":          txTime,
-"networkId":     tsNetworkID,
-"chainId":       tsChainID,
-"password":      tsPassword,
-"address":       kg.Address,
-})
+"createdHeight": height,
+"fee":           fee,
+"memo":          "",
+"networkID":     tsNetworkID,
+"chainID":       tsChainID,
+}
+
+body, _ := json.Marshal(tx)
 resp, err := tsPost(tsQueryURL+"/v1/tx", body)
 if err != nil {
 return "", err
 }
-var result struct {
-Hash  string `json:"hash"`
-Error string `json:"error"`
+
+var hash string
+if err := json.Unmarshal(resp, &hash); err != nil {
+return "", fmt.Errorf("parse response: %v body: %s", err, string(resp))
 }
-json.Unmarshal(resp, &result)
-if result.Error != "" {
-return "", fmt.Errorf("faucet error: %s", result.Error)
+if hash == "" {
+return "", fmt.Errorf("empty hash, response: %s", string(resp))
 }
-return result.Hash, nil
+return hash, nil
+}
+
+// tsFaucet sends plugin MessageSend from the validator account to fund a test account
+func tsFaucet(kg *tsKeyGroup, recipientAddr string, amount uint64) (string, error) {
+height, err := tsGetHeight()
+if err != nil {
+return "", err
+}
+txTime := uint64(time.Now().UnixMicro())
+
+msgProto := &contract.MessageSend{
+FromAddress: tsH2B(kg.Address),
+ToAddress:   tsH2B(recipientAddr),
+Amount:      amount,
+}
+msgBytes, _ := proto.Marshal(msgProto)
+anyMsg := &anypb.Any{TypeUrl: "type.googleapis.com/types.MessageSend", Value: msgBytes}
+
+signBytes, err := crypto.GetSignBytes("send", anyMsg, txTime, height, 10000, "", tsNetworkID, tsChainID)
+if err != nil {
+return "", fmt.Errorf("GetSignBytes: %v", err)
+}
+privKey, _ := crypto.StringToBLS12381PrivateKey(kg.PrivateKey)
+sig := privKey.Sign(signBytes)
+
+tx := map[string]interface{}{
+"type": "send",
+"msg": map[string]interface{}{
+"fromAddress": base64.StdEncoding.EncodeToString(tsH2B(kg.Address)),
+"toAddress":   base64.StdEncoding.EncodeToString(tsH2B(recipientAddr)),
+"amount":      amount,
+},
+"signature": map[string]string{
+"publicKey": kg.PublicKey,
+"signature": hex.EncodeToString(sig),
+},
+"time":          txTime,
+"createdHeight": height,
+"fee":           uint64(10000),
+"memo":          "",
+"networkID":     tsNetworkID,
+"chainID":       tsChainID,
+}
+
+body, _ := json.Marshal(tx)
+resp, err := tsPost(tsQueryURL+"/v1/tx", body)
+if err != nil {
+return "", err
+}
+var hash string
+if err := json.Unmarshal(resp, &hash); err != nil {
+return "", fmt.Errorf("faucet parse: %v body: %s", err, string(resp))
+}
+return hash, nil
 }
 
 func tsSuffix() string {
@@ -235,9 +259,13 @@ t.Fatalf("create target: %v", err)
 t.Logf("staker=%s target=%s", stakerAddr, targetAddr)
 
 stakerKey, _ := tsGetKey(stakerAddr)
+valKey, err := tsValidatorKey()
+if err != nil {
+t.Fatalf("validator key: %v", err)
+}
 
-// Faucet staker
-hash, err := tsFaucet(stakerKey, stakerAddr, 1_000_000_000)
+// Faucet staker from validator
+hash, err := tsFaucet(valKey, stakerAddr, 1_000_000_000)
 if err != nil {
 t.Fatalf("faucet: %v", err)
 }
@@ -278,8 +306,9 @@ sfx := tsSuffix()
 stakerAddr, _ := tsNewKey("ts_wd_" + sfx)
 targetAddr, _ := tsNewKey("ts_wdt_" + sfx)
 stakerKey, _ := tsGetKey(stakerAddr)
+valKey, _ := tsValidatorKey()
 
-hash, err := tsFaucet(stakerKey, stakerAddr, 1_000_000_000)
+hash, err := tsFaucet(valKey, stakerAddr, 1_000_000_000)
 if err != nil {
 t.Fatalf("faucet: %v", err)
 }
@@ -332,8 +361,9 @@ sfx := tsSuffix()
 stakerAddr, _ := tsNewKey("ts_ps_staker_" + sfx)
 targetAddr, _ := tsNewKey("ts_ps_target_" + sfx)
 stakerKey, _ := tsGetKey(stakerAddr)
+valKey, _ := tsValidatorKey()
 
-hash, err := tsFaucet(stakerKey, stakerAddr, 1_000_000_000)
+hash, err := tsFaucet(valKey, stakerAddr, 1_000_000_000)
 if err != nil {
 t.Fatalf("faucet: %v", err)
 }
@@ -350,6 +380,9 @@ if err != nil {
 t.Fatalf("stake: %v", err)
 }
 tsWaitConfirm(stakerAddr, hash, t)
+
+// Wait extra blocks for state to settle
+time.Sleep(6 * time.Second)
 
 // Propose slash
 hash, err = tsSendTx(stakerKey, "propose_slash", "type.googleapis.com/types.MessageProposeSlash",

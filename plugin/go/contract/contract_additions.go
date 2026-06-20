@@ -140,7 +140,7 @@ func (c *Contract) DeliverMessageStakeTrust(msg *MessageStakeTrust, fee uint64) 
 	staker.Amount -= amountToDeduct
 	feePool.Amount += fee
 
-	isNewStake := stake.Amount == 0 && stake.Status != StakeStatusActive
+	isNewStake := stake.Amount == 0 && stake.CreatedHeight == 0
 	stake.StakerAddress = msg.StakerAddress
 	stake.TargetAddress = msg.TargetAddress
 	stake.Amount += msg.Amount
@@ -628,7 +628,7 @@ func (c *Contract) buildSlashWriteSet(targetAddr, initiatorAddr []byte, feePool 
 	rangeQId := rand.Uint64()
 	rangeResp, err := c.plugin.StateRead(c, &PluginStateReadRequest{
 		Ranges: []*PluginRangeRead{
-			{QueryId: rangeQId, Prefix: trustStakePrefix, Limit: 0},
+			{QueryId: rangeQId, Prefix: JoinLenPrefix(trustStakePrefix), Limit: 0},
 		},
 	})
 	if err != nil {
@@ -802,7 +802,7 @@ func (c *Contract) DeliverMessageWithdrawStake(msg *MessageWithdrawStake, fee ui
 	case StakeStatusActive:
 		proposalRangeQId := rand.Uint64()
 		rangeResp, rErr := c.plugin.StateRead(c, &PluginStateReadRequest{
-			Ranges: []*PluginRangeRead{{QueryId: proposalRangeQId, Prefix: slashProposalPrefix, Limit: 0}},
+			Ranges: []*PluginRangeRead{{QueryId: proposalRangeQId, Prefix: JoinLenPrefix(slashProposalPrefix), Limit: 0}},
 		})
 		if rErr != nil {
 			return &PluginDeliverResponse{Error: rErr}
