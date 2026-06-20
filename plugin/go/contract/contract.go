@@ -1442,6 +1442,16 @@ func msgFromAny(a *anypb.Any) (proto.Message, *PluginError) {
 		msg = new(MessageResumeSubscription)
 	case "type.googleapis.com/types.MessageUpdatePlan":
 		msg = new(MessageUpdatePlan)
+	case "type.googleapis.com/types.MessageStakeTrust":
+		msg = new(MessageStakeTrust)
+	case "type.googleapis.com/types.MessageProposeSlash":
+		msg = new(MessageProposeSlash)
+	case "type.googleapis.com/types.MessageVoteSlash":
+		msg = new(MessageVoteSlash)
+	case "type.googleapis.com/types.MessageResolveSlash":
+		msg = new(MessageResolveSlash)
+	case "type.googleapis.com/types.MessageWithdrawStake":
+		msg = new(MessageWithdrawStake)
 	default:
 		return nil, ErrFromAny(fmt.Errorf("unknown type url: %s", a.TypeUrl))
 	}

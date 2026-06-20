@@ -22,29 +22,39 @@
     "cancel_subscription",
     "pause_subscription",
     "resume_subscription",
-    "update_plan"
+    "update_plan",
+    "stake_trust",
+    "propose_slash",
+    "vote_slash",
+    "resolve_slash",
+    "withdraw_stake"
   ],
   "transactionTypeUrls": {
-    "send":                  "type.googleapis.com/types.MessageSend",
-    "create_plan":           "type.googleapis.com/types.MessageCreatePlan",
-    "subscribe":             "type.googleapis.com/types.MessageSubscribe",
-    "process_billing":       "type.googleapis.com/types.MessageProcessBilling",
-    "cancel_subscription":   "type.googleapis.com/types.MessageCancelSubscription",
-    "pause_subscription":    "type.googleapis.com/types.MessagePauseSubscription",
-    "resume_subscription":   "type.googleapis.com/types.MessageResumeSubscription",
-    "update_plan":           "type.googleapis.com/types.MessageUpdatePlan"
+    "send": "type.googleapis.com/types.MessageSend",
+    "create_plan": "type.googleapis.com/types.MessageCreatePlan",
+    "subscribe": "type.googleapis.com/types.MessageSubscribe",
+    "process_billing": "type.googleapis.com/types.MessageProcessBilling",
+    "cancel_subscription": "type.googleapis.com/types.MessageCancelSubscription",
+    "pause_subscription": "type.googleapis.com/types.MessagePauseSubscription",
+    "resume_subscription": "type.googleapis.com/types.MessageResumeSubscription",
+    "update_plan": "type.googleapis.com/types.MessageUpdatePlan",
+    "stake_trust": "type.googleapis.com/types.MessageStakeTrust",
+    "propose_slash": "type.googleapis.com/types.MessageProposeSlash",
+    "vote_slash": "type.googleapis.com/types.MessageVoteSlash",
+    "resolve_slash": "type.googleapis.com/types.MessageResolveSlash",
+    "withdraw_stake": "type.googleapis.com/types.MessageWithdrawStake"
   },
   "feeParams": {
-    "sendFee":           10000,
-    "createPlanFee":     50000,
-    "subscribeFee":      10000,
+    "sendFee": 10000,
+    "createPlanFee": 50000,
+    "subscribeFee": 10000,
     "processBillingFee": 5000,
-    "cancelFee":         10000,
-    "updatePlanFee":     20000,
-    "pauseFee":          10000
+    "cancelFee": 10000,
+    "updatePlanFee": 20000,
+    "pauseFee": 10000
   },
   "rpc": {
     "queryPort": 50002,
-    "adminPort":  50003
+    "adminPort": 50003
   }
 }

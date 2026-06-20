@@ -1,6 +1,8 @@
 module github.com/canopy-network/go-plugin
 
-go 1.25
+go 1.24.0
+
+toolchain go1.24.2
 
 require (
 	github.com/drand/kyber v1.3.2
@@ -13,3 +15,5 @@ require (
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 )
+
+replace github.com/drand/kyber => github.com/drand/kyber v1.3.0
