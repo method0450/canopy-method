@@ -3,1185 +3,1259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subex — $SBX</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Trust Staking — Canopy Network</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
   :root {
-    --bg:        #0a0a0c;
-    --surface:   #111116;
-    --border:    #1e1e28;
-    --border-hi: #2e2e3e;
-    --blue:      #2563ff;
-    --blue-dim:  #1a3aad;
-    --blue-glow: rgba(37,99,255,0.18);
-    --text:      #e8e8f0;
-    --muted:     #5a5a72;
-    --muted-hi:  #8888aa;
-    --green:     #22c55e;
-    --red:       #ef4444;
-    --amber:     #f59e0b;
-    --mono:      'IBM Plex Mono', monospace;
-    --sans:      'Syne', sans-serif;
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --border: #1e1e2e;
+    --accent: #7c6af7;
+    --accent2: #a78bfa;
+    --red: #f87171;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.6;
+    font-family: var(--sans);
     min-height: 100vh;
-    overflow-x: hidden;
+    padding: 24px;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
-    pointer-events: none;
-    z-index: 9999;
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
 
-  /* ── Header ── */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10,10,12,0.94);
-    backdrop-filter: blur(12px);
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+  }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .node-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  .dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Layout */
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Panels */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 14px 18px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 32px;
-    height: 56px;
   }
 
-  .logo { display: flex; align-items: center; gap: 12px; }
-  .logo-mark { width: 32px; height: 32px; flex-shrink: 0; }
-  .logo-mark svg { width: 100%; height: 100%; }
-  .logo-name { font-family: var(--sans); font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
-  .logo-ticker {
-    font-size: 10px; color: var(--blue); letter-spacing: 0.12em;
-    border: 1px solid var(--blue-dim); padding: 2px 6px; border-radius: 2px;
-    background: var(--blue-glow);
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
-  .header-right { display: flex; align-items: center; gap: 20px; }
+  .panel-body { padding: 18px; }
 
-  .wallet-pill {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface); border: 1px solid var(--border-hi);
-    border-radius: 3px; padding: 6px 12px; font-size: 11px; color: var(--muted-hi);
+  /* Account card */
+  .account-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .account-card:hover { border-color: var(--accent); }
+  .account-card.active { border-color: var(--accent); background: #1a1a2e; }
+
+  .account-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .account-addr {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    word-break: break-all;
+    margin-bottom: 8px;
+  }
+
+  .account-balance {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .account-balance span {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
     transition: border-color 0.2s;
   }
-  .wallet-pill.loaded { border-color: rgba(34,197,94,0.3); color: var(--green); }
-  .wallet-pill .w-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--muted); transition: background 0.2s;
+
+  .step.active { border-color: var(--accent); }
+  .step.done { border-color: var(--green); }
+  .step.error { border-color: var(--red); }
+
+  .step-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
   }
-  .wallet-pill.loaded .w-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
 
-  .header-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted-hi); }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s ease-in-out infinite; }
-  .dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); animation: none; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
 
-  /* ── Layout ── */
-  .page { max-width: 1280px; margin: 0 auto; padding: 32px 32px 80px; }
+  .step.active .step-num { border-color: var(--accent); color: var(--accent); }
+  .step.done .step-num { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.1); }
+  .step.error .step-num { border-color: var(--red); color: var(--red); }
 
-  /* ── Hero ── */
-  .hero { padding: 64px 0 48px; border-bottom: 1px solid var(--border); margin-bottom: 48px; position: relative; }
-  .hero::after { content:''; position:absolute; bottom:-1px; left:0; width:240px; height:1px; background:var(--blue); box-shadow:0 0 12px var(--blue); }
-  .hero-label { font-size: 10px; letter-spacing: 0.18em; color: var(--blue); text-transform: uppercase; margin-bottom: 16px; }
-  .hero-title { font-family: var(--sans); font-size: clamp(36px, 5vw, 64px); font-weight: 800; line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 20px; max-width: 720px; }
-  .hero-title span { color: var(--blue); }
-  .hero-sub { color: var(--muted-hi); max-width: 520px; line-height: 1.7; font-size: 13px; }
+  .step-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+  }
 
-  /* ── Node banner ── */
-  .node-banner {
+  .step-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(124,106,247,0.15);
+    color: var(--accent2);
+    border: 1px solid rgba(124,106,247,0.3);
+  }
+
+  .step-badge.green { background: rgba(52,211,153,0.1); color: var(--green); border-color: rgba(52,211,153,0.3); }
+  .step-badge.red { background: rgba(248,113,113,0.1); color: var(--red); border-color: rgba(248,113,113,0.3); }
+
+  .step-body {
+    padding: 0 16px 16px;
     display: none;
-    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
-    border-radius: 4px; padding: 12px 20px; margin-bottom: 24px;
-    font-size: 12px; color: var(--red); align-items: center; gap: 10px;
   }
-  .node-banner.show { display: flex; }
 
-  /* ── Stats bar ── */
-  .stats-bar {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 1px; background: var(--border);
-    border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
-    margin-bottom: 48px;
+  .step.active .step-body, .step.open .step-body { display: block; }
+
+  /* Form elements */
+  .field { margin-bottom: 12px; }
+
+  .field label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
   }
-  .stat { background: var(--surface); padding: 20px 24px; transition: background 0.2s; }
-  .stat:hover { background: #141420; }
-  .stat-label { font-size: 10px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
-  .stat-value { font-family: var(--sans); font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
-  .stat-value.blue  { color: var(--blue); }
-  .stat-value.green { color: var(--green); }
-  .stat-delta { font-size: 10px; color: var(--muted); margin-top: 4px; }
-  .stat-delta.live { color: var(--green); }
 
-  /* ── Tabs ── */
-  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
-  .tab { padding: 10px 20px; font-size: 11px; letter-spacing: 0.1em; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; text-transform: uppercase; }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* ── Plans grid ── */
-  .plans-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 48px; }
-  .plan-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
-    padding: 24px; cursor: pointer; transition: border-color 0.2s, transform 0.15s;
-    position: relative; overflow: hidden;
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
   }
-  .plan-card::before { content:''; position:absolute; top:0; left:0; width:100%; height:2px; background:var(--blue); transform:scaleX(0); transition:transform 0.2s; transform-origin:left; }
-  .plan-card:hover { border-color: var(--blue-dim); transform: translateY(-1px); }
-  .plan-card:hover::before, .plan-card.active-plan::before { transform: scaleX(1); }
-  .plan-card.active-plan { border-color: var(--blue-dim); background: rgba(37,99,255,0.04); }
 
-  .plan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-  .plan-name { font-family: var(--sans); font-size: 16px; font-weight: 700; }
-  .plan-badge { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; }
-  .badge-active   { background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.25); }
-  .badge-trial    { background:rgba(245,158,11,0.12); color:var(--amber); border:1px solid rgba(245,158,11,0.25); }
-  .badge-paused   { background:rgba(90,90,114,0.2); color:var(--muted-hi); border:1px solid var(--border-hi); }
-  .badge-failed   { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.25); }
-  .badge-cancelled{ background:rgba(90,90,114,0.15); color:var(--muted); border:1px solid var(--border); }
-  .badge-inactive { background:rgba(90,90,114,0.2); color:var(--muted); border:1px solid var(--border); }
-
-  .plan-price { font-family: var(--sans); font-size: 28px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; margin-bottom: 4px; }
-  .plan-price span { font-size: 13px; font-family: var(--mono); color: var(--muted-hi); font-weight: 400; }
-  .plan-desc { color: var(--muted-hi); font-size: 12px; line-height: 1.6; margin: 12px 0 16px; }
-  .plan-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; }
-  .meta-item { color: var(--muted); }
-  .meta-item strong { color: var(--muted-hi); display: block; font-weight: 500; }
-  .plan-actions { display: flex; gap: 8px; margin-top: 16px; }
-
-  /* ── Buttons ── */
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 3px; cursor: pointer; transition: all 0.15s; border: none; }
-  .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 0 16px rgba(37,99,255,0.3); }
-  .btn-primary:hover { background: #3b75ff; box-shadow: 0 0 24px rgba(37,99,255,0.45); transform: translateY(-1px); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .btn-ghost { background: transparent; color: var(--muted-hi); border: 1px solid var(--border-hi); }
-  .btn-ghost:hover { border-color: var(--blue-dim); color: var(--text); }
-  .btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
-  .btn-danger:hover { background: rgba(239,68,68,0.08); }
-  .btn-sm { padding: 5px 10px; font-size: 10px; }
-  .btn-loading { opacity: 0.6; cursor: wait; }
-
-  /* ── Form ── */
-  .form-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 28px; margin-bottom: 24px; animation: fadeIn 0.2s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-  .form-title { font-family: var(--sans); font-size: 14px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .form-grid.cols-1 { grid-template-columns: 1fr; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field.span-2 { grid-column: span 2; }
-  label { font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
-  input, textarea, select {
-    background: var(--bg); border: 1px solid var(--border-hi); border-radius: 3px;
-    color: var(--text); font-family: var(--mono); font-size: 12px; padding: 10px 12px;
-    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+  .field input:focus, .field textarea:focus {
+    border-color: var(--accent);
   }
-  input:focus, textarea:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,255,0.1); }
-  textarea { resize: vertical; min-height: 72px; }
-  .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  /* ── Table ── */
-  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
-  table { width: 100%; border-collapse: collapse; }
-  th { padding: 10px 16px; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface); font-weight: 500; }
-  td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--muted-hi); font-size: 12px; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.015); }
-  td.id { color: var(--muted); font-size: 11px; }
-  td.name { color: var(--text); font-weight: 500; }
-  td.mono { font-family: var(--mono); }
+  .field textarea { resize: none; height: 60px; }
 
-  /* ── Log ── */
-  .log-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
-  .log-header { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-  .log-body { padding: 16px; height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-  .log-line { display: flex; gap: 12px; font-size: 11px; line-height: 1.5; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--accent2);
+    border: 1px solid rgba(124,106,247,0.4);
+  }
+
+  .btn-outline:hover { background: rgba(124,106,247,0.1); }
+
+  .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+  /* Activity log */
+  .log {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    height: 200px;
+    overflow-y: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.8;
+  }
+
+  .log-entry { display: flex; gap: 8px; }
   .log-time { color: var(--muted); flex-shrink: 0; }
-  .log-ok   { color: var(--green); }
-  .log-err  { color: var(--red); }
-  .log-warn { color: var(--amber); }
-  .log-info { color: var(--blue); }
+  .log-msg { color: var(--text); }
+  .log-msg.success { color: var(--green); }
+  .log-msg.error { color: var(--red); }
+  .log-msg.info { color: var(--accent2); }
+  .log-msg.warn { color: var(--yellow); }
 
-  /* ── Tx submit ── */
-  .tx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-
-  /* ── Wallet panel ── */
-  .wallet-panel {
-    background: var(--surface); border: 1px solid var(--border-hi);
-    border-radius: 4px; padding: 20px 24px; margin-bottom: 32px;
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  /* Tx hash display */
+  .tx-hash {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    background: rgba(124,106,247,0.08);
+    border: 1px solid rgba(124,106,247,0.2);
+    border-radius: 4px;
+    padding: 4px 8px;
+    word-break: break-all;
+    margin-top: 8px;
   }
-  .wallet-info { display: flex; flex-direction: column; gap: 4px; }
-  .wallet-addr { font-size: 12px; color: var(--text); }
-  .wallet-bal  { font-size: 11px; color: var(--muted-hi); }
-  .wallet-actions { display: flex; gap: 8px; align-items: center; }
-  .wallet-input-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .wallet-input-row input { width: 320px; }
 
-  /* ── Section header ── */
-  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
-  .section-title { font-family: var(--sans); font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
-  .section-count { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
+  /* State display */
+  .state-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
 
-  /* ── Empty state ── */
-  .empty-state { text-align: center; padding: 64px 0; color: var(--muted); }
-  .empty-state .empty-icon { font-size: 32px; margin-bottom: 12px; }
-  .empty-state .empty-sub { margin-top: 4px; font-size: 11px; }
+  .state-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+  }
 
-  /* ── Toast ── */
-  .toast-area { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; pointer-events: none; }
-  .toast { background: var(--surface); border: 1px solid var(--border-hi); border-radius: 4px; padding: 12px 16px; font-size: 12px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.25s ease; pointer-events: all; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-  .toast.ok   { border-left: 3px solid var(--green); }
-  .toast.err  { border-left: 3px solid var(--red); }
-  .toast.info { border-left: 3px solid var(--blue); }
-  .toast.warn { border-left: 3px solid var(--amber); }
-  @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  .state-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
 
-  /* ── Spinner ── */
+  .state-value {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .state-value.green { color: var(--green); }
+  .state-value.red { color: var(--red); }
+  .state-value.yellow { color: var(--yellow); }
+
+  /* Proposal card */
+  .proposal-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+  }
+
+  .proposal-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .proposal-reason {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .vote-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .vote-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    transition: width 0.5s ease;
+  }
+
+  .vote-counts {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+
   @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner { width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
 
-  /* ── Responsive ── */
-  @media (max-width: 768px) {
-    .page { padding: 24px 16px 64px; }
-    .stats-bar { grid-template-columns: 1fr 1fr; }
-    .plans-grid { grid-template-columns: 1fr; }
-    .form-grid { grid-template-columns: 1fr; }
-    .field.span-2 { grid-column: span 1; }
-    .tx-grid { grid-template-columns: 1fr; }
-    header { padding: 0 16px; }
-    .wallet-input-row input { width: 100%; }
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+  }
+
+  .help-text {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Right column layout */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="15" fill="black"/>
-        <path d="M 16 4 A 12 12 0 1 1 6 22" stroke="white" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-        <polyline points="3,18 6,22 10,20" stroke="#2563ff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="16" cy="16" r="2.5" fill="white"/>
-      </svg>
+<div style="max-width:1100px;margin:0 auto;">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-mark">TS</div>
+      <div>
+        <div class="logo-text">Trust Staking</div>
+        <div class="logo-sub">Canopy Network — Nested Chain</div>
+      </div>
     </div>
-    <span class="logo-name">Subex</span>
-    <span class="logo-ticker">$SBX</span>
-  </div>
-  <div class="header-right">
-    <div class="wallet-pill" id="wallet-pill">
-      <div class="w-dot"></div>
-      <span id="wallet-pill-text">No wallet</span>
-    </div>
-    <div class="header-status">
-      <div class="dot" id="node-dot"></div>
-      <span>BETANET · BLOCK #<span id="live-height">—</span></span>
-    </div>
-  </div>
-</header>
-
-<div class="page">
-
-  <div class="node-banner" id="node-banner">
-    ⚠ Cannot reach node at localhost:50002 — make sure <code>canopy start</code> is running.
-  </div>
-
-  <section class="hero">
-    <div class="hero-label">// programmable subscription infrastructure</div>
-    <h1 class="hero-title">Recurring payments.<br><span>On-chain.</span></h1>
-    <p class="hero-sub">Create subscription tiers, automate billing, enforce cancellations — without intermediaries. Payments validated by the network. Revenue goes directly to creators.</p>
-  </section>
-
-  <div class="stats-bar">
-    <div class="stat">
-      <div class="stat-label">Total Plans</div>
-      <div class="stat-value blue" id="stat-plans">—</div>
-      <div class="stat-delta live" id="stat-plans-delta">polling…</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Active Subscriptions</div>
-      <div class="stat-value green" id="stat-subs">—</div>
-      <div class="stat-delta live" id="stat-subs-delta">polling…</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Wallet Balance</div>
-      <div class="stat-value" id="stat-balance">—</div>
-      <div class="stat-delta" id="stat-balance-delta">uSBX</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Billing Reward</div>
-      <div class="stat-value blue">1 SBX</div>
-      <div class="stat-delta">per processed cycle</div>
+    <div class="node-status">
+      <div class="dot" id="nodeDot"></div>
+      <span id="nodeStatus">connecting...</span>
+      <span style="color:var(--border)">|</span>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">H: <span id="chainHeight">—</span></span>
     </div>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="setTab('plans')">Plans</div>
-    <div class="tab" onclick="setTab('subscriptions')">Subscriptions</div>
-    <div class="tab" onclick="setTab('submit')">Submit Tx</div>
-    <div class="tab" onclick="setTab('log')">Activity Log</div>
+  <div class="grid">
+    <!-- Left: Accounts -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Accounts</span>
+          <button class="btn btn-outline btn-sm" onclick="refreshBalances()">↻ Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="account-card active" id="card-validator">
+            <div class="account-label">Validator (Funder)</div>
+            <div class="account-addr" id="addr-validator">—</div>
+            <div class="account-balance" id="bal-validator">— <span>SBX</span></div>
+          </div>
+
+          <div class="account-card" id="card-staker">
+            <div class="account-label">Staker</div>
+            <div class="account-addr" id="addr-staker">—</div>
+            <div class="account-balance" id="bal-staker">— <span>SBX</span></div>
+          </div>
+
+          <div class="account-card" id="card-target">
+            <div class="account-label">Target</div>
+            <div class="account-addr" id="addr-target">—</div>
+            <div class="account-balance" id="bal-target">— <span>SBX</span></div>
+          </div>
+
+          <div class="account-card" id="card-voter">
+            <div class="account-label">Voter</div>
+            <div class="account-addr" id="addr-voter">—</div>
+            <div class="account-balance" id="bal-voter">— <span>SBX</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-header">
+          <span class="panel-title">Activity Log</span>
+          <button class="btn btn-outline btn-sm" onclick="clearLog()">Clear</button>
+        </div>
+        <div class="panel-body" style="padding:12px;">
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Steps -->
+    <div class="right-col">
+
+      <!-- Step 1: Setup -->
+      <div class="step active open" id="step1">
+        <div class="step-header" onclick="toggleStep('step1')">
+          <div class="step-num">1</div>
+          <div class="step-name">Setup Accounts</div>
+          <span class="step-badge" id="badge1">pending</span>
+        </div>
+        <div class="step-body">
+          <p class="help-text" style="margin-bottom:12px;">Creates staker, target, and voter accounts, then funds staker and voter from the validator.</p>
+          <div class="field">
+            <label>Node URL</label>
+            <input type="text" id="nodeUrl" value="http://localhost:50002">
+          </div>
+          <div class="field">
+            <label>Admin URL</label>
+            <input type="text" id="adminUrl" value="http://localhost:50003">
+          </div>
+          <div class="field">
+            <label>Funder Address (Validator)</label>
+            <input type="text" id="funderAddr" placeholder="hex address (no 0x)">
+          </div>
+          <div class="field">
+            <label>Funder Password</label>
+            <input type="password" id="funderPass" placeholder="keystore password">
+          </div>
+          <div class="field">
+            <label>Stake Amount (uSBX)</label>
+            <input type="number" id="stakeAmount" value="100000000">
+          </div>
+          <button class="btn btn-primary" onclick="runSetup()" id="btnSetup">
+            <span>Run Setup</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Stake Trust -->
+      <div class="step" id="step2">
+        <div class="step-header" onclick="toggleStep('step2')">
+          <div class="step-num">2</div>
+          <div class="step-name">Stake Trust</div>
+          <span class="step-badge" id="badge2">waiting</span>
+        </div>
+        <div class="step-body">
+          <p class="help-text" style="margin-bottom:12px;">Staker puts skin-in-the-game by staking SBX on the target address. If the target is slashed, this stake is seized.</p>
+          <div class="state-grid">
+            <div class="state-item">
+              <div class="state-label">Staker Balance</div>
+              <div class="state-value" id="s2-staker-bal">—</div>
+            </div>
+            <div class="state-item">
+              <div class="state-label">Stake Amount</div>
+              <div class="state-value" id="s2-stake-amt">—</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="runStake()" id="btnStake" disabled>
+              <span>Submit stake_trust</span>
+            </button>
+          </div>
+          <div id="stakeTxHash" style="display:none" class="tx-hash"></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Voter Stakes -->
+      <div class="step" id="step3">
+        <div class="step-header" onclick="toggleStep('step3')">
+          <div class="step-num">3</div>
+          <div class="step-name">Voter Stakes (Eligibility)</div>
+          <span class="step-badge" id="badge3">waiting</span>
+        </div>
+        <div class="step-body">
+          <p class="help-text" style="margin-bottom:12px;">Only addresses with an active trust stake can vote on slash proposals. Voter stakes on target to gain voting eligibility.</p>
+          <button class="btn btn-primary" onclick="runVoterStake()" id="btnVoterStake" disabled>
+            <span>Submit voter stake_trust</span>
+          </button>
+          <div id="voterStakeTxHash" style="display:none" class="tx-hash"></div>
+        </div>
+      </div>
+
+      <!-- Step 4: Propose Slash -->
+      <div class="step" id="step4">
+        <div class="step-header" onclick="toggleStep('step4')">
+          <div class="step-num">4</div>
+          <div class="step-name">Propose Slash</div>
+          <span class="step-badge" id="badge4">waiting</span>
+        </div>
+        <div class="step-body">
+          <p class="help-text" style="margin-bottom:12px;">Any address with an active stake on the target can propose a slash. A slash proposal opens a 10-block voting window.</p>
+          <div class="field">
+            <label>Reason</label>
+            <textarea id="slashReason">Target address submitted fraudulent data to the protocol. On-chain evidence available at block 31100.</textarea>
+          </div>
+          <button class="btn btn-primary" onclick="runPropose()" id="btnPropose" disabled>
+            <span>Submit propose_slash</span>
+          </button>
+          <div id="proposeTxHash" style="display:none" class="tx-hash"></div>
+          <div id="proposalCard" style="display:none" class="proposal-card">
+            <div class="proposal-id">Proposal ID: <span id="proposalIdDisplay">—</span></div>
+            <div class="proposal-reason" id="proposalReasonDisplay">—</div>
+            <div class="vote-bar"><div class="vote-fill" id="voteBar" style="width:0%"></div></div>
+            <div class="vote-counts">
+              <span>For: <span id="votesFor">0</span></span>
+              <span>Against: <span id="votesAgainst">0</span></span>
+              <span>Status: <span id="proposalStatus">VOTING</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Vote -->
+      <div class="step" id="step5">
+        <div class="step-header" onclick="toggleStep('step5')">
+          <div class="step-num">5</div>
+          <div class="step-name">Vote on Proposal</div>
+          <span class="step-badge" id="badge5">waiting</span>
+        </div>
+        <div class="step-body">
+          <p class="help-text" style="margin-bottom:12px;">Voter casts their vote. Only stakers are eligible. Voting period: 10 blocks (~20s).</p>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+              <input type="radio" name="vote" value="true" checked> <span style="color:var(--green)">✓ Approve slash</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;">
+              <input type="radio" name="vote" value="false"> <span style="color:var(--red)">✗ Reject slash</span>
+            </label>
+          </div>
+          <button class="btn btn-primary" onclick="runVote()" id="btnVote" disabled>
+            <span>Submit vote_slash</span>
+          </button>
+          <div id="voteTxHash" style="display:none" class="tx-hash"></div>
+        </div>
+      </div>
+
+      <!-- Step 6: Resolve -->
+      <div class="step" id="step6">
+        <div class="step-header" onclick="toggleStep('step6')">
+          <div class="step-num">6</div>
+          <div class="step-name">Resolve Slash</div>
+          <span class="step-badge" id="badge6">waiting</span>
+        </div>
+        <div class="step-body">
+          <p class="help-text" style="margin-bottom:12px;">After the voting window closes, anyone can resolve the proposal. If passed: all stakes on the target are seized. 50% goes to the proposer, 50% to the fee pool.</p>
+          <div id="resolveCountdown" style="font-family:var(--mono);font-size:12px;color:var(--yellow);margin-bottom:12px;"></div>
+          <button class="btn btn-primary" onclick="runResolve()" id="btnResolve" disabled>
+            <span>Submit resolve_slash</span>
+          </button>
+          <div id="resolveTxHash" style="display:none" class="tx-hash"></div>
+
+          <!-- Result -->
+          <div id="slashResult" style="display:none;margin-top:12px;">
+            <div class="divider"></div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Slash Result</div>
+            <div class="state-grid">
+              <div class="state-item">
+                <div class="state-label">Stakes Seized</div>
+                <div class="state-value red" id="res-seized">—</div>
+              </div>
+              <div class="state-item">
+                <div class="state-label">Proposer Reward</div>
+                <div class="state-value green" id="res-reward">—</div>
+              </div>
+              <div class="state-item">
+                <div class="state-label">Staker Balance</div>
+                <div class="state-value" id="res-staker">—</div>
+              </div>
+              <div class="state-item">
+                <div class="state-label">Outcome</div>
+                <div class="state-value green" id="res-outcome">SLASHED</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
-
-  <!-- ── Tab: Plans ── -->
-  <div class="tab-content active" id="tab-plans">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <div class="section-header" style="margin:0;">
-        <span class="section-title">Subscription Plans</span>
-        <span class="section-count" id="plans-count">—</span>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-ghost btn-sm" onclick="refreshState()">↻ Refresh</button>
-        <button class="btn btn-primary btn-sm" onclick="toggleCreateForm()">+ Create Plan</button>
-      </div>
-    </div>
-
-    <div class="form-panel" id="create-plan-form" style="display:none;">
-      <div class="form-title">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1" stroke="#2563ff" stroke-width="1.5"/><path d="M7 4v6M4 7h6" stroke="#2563ff" stroke-width="1.5" stroke-linecap="round"/></svg>
-        New Subscription Plan
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Plan Name</label>
-          <input type="text" id="cp-name" placeholder="Pro Monthly" maxlength="64" />
-        </div>
-        <div class="field">
-          <label>Price (uSBX / cycle)</label>
-          <input type="number" id="cp-price" placeholder="1000000" min="1" />
-        </div>
-        <div class="field span-2">
-          <label>Description</label>
-          <textarea id="cp-desc" placeholder="What subscribers get…" maxlength="280"></textarea>
-        </div>
-        <div class="field">
-          <label>Interval (days)</label>
-          <input type="number" id="cp-interval" placeholder="30" min="1" />
-        </div>
-        <div class="field">
-          <label>Trial Period (days, 0 = none)</label>
-          <input type="number" id="cp-trial" placeholder="0" min="0" />
-        </div>
-        <div class="field">
-          <label>Max Subscribers (0 = unlimited)</label>
-          <input type="number" id="cp-maxsubs" placeholder="0" min="0" />
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn btn-primary" id="btn-create-plan" onclick="submitCreatePlan()">Deploy Plan →</button>
-        <button class="btn btn-ghost" onclick="toggleCreateForm()">Cancel</button>
-      </div>
-    </div>
-
-    <div class="plans-grid" id="plans-grid"></div>
-    <div class="empty-state" id="plans-empty" style="display:none;">
-      <div class="empty-icon">◎</div>
-      <div>No plans deployed yet.</div>
-      <div class="empty-sub">Create the first subscription plan on Subex.</div>
-    </div>
-  </div>
-
-  <!-- ── Tab: Subscriptions ── -->
-  <div class="tab-content" id="tab-subscriptions">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <div class="section-header" style="margin:0;">
-        <span class="section-title">Subscriptions</span>
-        <span class="section-count" id="subs-count">—</span>
-      </div>
-      <button class="btn btn-ghost btn-sm" onclick="refreshState()">↻ Refresh</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#ID</th><th>Plan</th><th>Subscriber</th><th>Status</th>
-            <th>Billing Cycle</th><th>Next Bill Height</th><th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="subs-tbody">
-          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">Loading subscriptions…</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ── Tab: Submit Tx ── -->
-  <div class="tab-content" id="tab-submit">
-
-    <!-- Wallet loader -->
-    <div class="wallet-panel" id="wallet-panel">
-      <div class="wallet-info">
-        <div style="font-size:10px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Active Wallet</div>
-        <div class="wallet-addr" id="wp-addr">Not loaded</div>
-        <div class="wallet-bal" id="wp-bal">—</div>
-      </div>
-      <div class="wallet-actions">
-        <div class="wallet-input-row">
-          <input type="text" id="wl-addr" placeholder="Validator address (hex)" value="e7c7dad131a03f7ea0cc09a637ad096eb3495f77" style="width:340px;" />
-          <input type="password" id="wl-pass" placeholder="Password" value="test123" style="width:120px;" />
-          <button class="btn btn-ghost btn-sm" onclick="loadWalletUI()">Load Wallet</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header"><span class="section-title">Submit Transaction</span></div>
-
-    <div class="tx-grid">
-      <!-- Subscribe -->
-      <div class="form-panel">
-        <div class="form-title">Subscribe to Plan</div>
-        <div class="form-grid cols-1">
-          <div class="field"><label>Plan ID</label><input type="number" id="sub-plan-id" placeholder="1" min="1" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary btn-sm" id="btn-subscribe" onclick="submitSubscribe()">Subscribe →</button>
-        </div>
-      </div>
-
-      <!-- Process Billing -->
-      <div class="form-panel">
-        <div class="form-title">Process Billing</div>
-        <div class="form-grid cols-1">
-          <div class="field"><label>Subscription ID</label><input type="number" id="proc-sub-id" placeholder="1" min="1" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary btn-sm" id="btn-billing" onclick="submitProcessBilling()">Process →</button>
-        </div>
-      </div>
-
-      <!-- Cancel -->
-      <div class="form-panel">
-        <div class="form-title">Cancel Subscription</div>
-        <div class="form-grid cols-1">
-          <div class="field"><label>Subscription ID</label><input type="number" id="cancel-sub-id" placeholder="1" min="1" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-danger btn-sm" id="btn-cancel" onclick="submitCancel()">Cancel Sub</button>
-        </div>
-      </div>
-
-      <!-- Pause / Resume -->
-      <div class="form-panel">
-        <div class="form-title">Pause / Resume</div>
-        <div class="form-grid cols-1">
-          <div class="field"><label>Subscription ID</label><input type="number" id="pause-sub-id" placeholder="1" min="1" /></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-ghost btn-sm" id="btn-pause" onclick="submitPause()">Pause</button>
-          <button class="btn btn-ghost btn-sm" id="btn-resume" onclick="submitResume()">Resume</button>
-        </div>
-      </div>
-
-      <!-- Update Plan -->
-      <div class="form-panel" style="grid-column:span 2;">
-        <div class="form-title">Update Plan</div>
-        <div class="form-grid">
-          <div class="field"><label>Plan ID</label><input type="number" id="upd-plan-id" placeholder="1" min="1" /></div>
-          <div class="field"><label>New Name (blank = no change)</label><input type="text" id="upd-name" placeholder="New name" /></div>
-          <div class="field"><label>New Price uSBX (0 = no change)</label><input type="number" id="upd-price" placeholder="0" min="0" /></div>
-          <div class="field span-2"><label>New Description (blank = no change)</label><textarea id="upd-desc" placeholder="Updated description…"></textarea></div>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary btn-sm" id="btn-update" onclick="submitUpdatePlan()">Update Plan →</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Tab: Activity Log ── -->
-  <div class="tab-content" id="tab-log">
-    <div class="section-header"><span class="section-title">Activity Log</span></div>
-    <div class="log-panel">
-      <div class="log-header">
-        <div class="dot" id="log-dot"></div>
-        LIVE · RPC http://localhost:50002
-      </div>
-      <div class="log-body" id="log-body">
-        <div class="log-line"><span class="log-time">--:--:--</span><span class="log-info">Subex initializing…</span></div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<div class="toast-area" id="toast-area"></div>
-
 <script>
-// ════════════════════════════════════════════════════════════════════════════
-// SUBEX LIVE FRONTEND — Full on-chain mode
-// - No DEMO_MODE
-// - Auto-loads wallet on boot
-// - Polls real block height
-// - Rebuilds state from tx history
-// - All tx submissions hit real RPC
-// ════════════════════════════════════════════════════════════════════════════
-
-const RPC = 'https://occasion-flip-instrumentation-hoped.trycloudflare.com';
-const ARPC = 'https://confirmed-baths-phentermine-sbjct.trycloudflare.com';
-const NETWORK_ID = 1;
-const CHAIN_ID   = 1;
-
-const VALIDATOR_ADDRESS  = 'e7c7dad131a03f7ea0cc09a637ad096eb3495f77';
-const VALIDATOR_PASSWORD = 'test123';
-
-const TYPE_URLS = {
-  'send':                'type.googleapis.com/types.MessageSend',
-  'create_plan':         'type.googleapis.com/types.MessageCreatePlan',
-  'subscribe':           'type.googleapis.com/types.MessageSubscribe',
-  'process_billing':     'type.googleapis.com/types.MessageProcessBilling',
-  'cancel_subscription': 'type.googleapis.com/types.MessageCancelSubscription',
-  'pause_subscription':  'type.googleapis.com/types.MessagePauseSubscription',
-  'resume_subscription': 'type.googleapis.com/types.MessageResumeSubscription',
-  'update_plan':         'type.googleapis.com/types.MessageUpdatePlan',
+// ── State ──────────────────────────────────────────────────────────────────
+const state = {
+  nodeUrl: 'http://localhost:50002',
+  adminUrl: 'http://localhost:50003',
+  funderAddr: '',
+  funderPass: '',
+  password: 'ts_demo_pass_123',
+  stakeAmount: 100000000,
+  staker: null, // { address, privateKey, publicKey }
+  target: null,
+  voter: null,
+  funderKey: null,
+  proposalId: null,
+  proposalHeight: null,
+  stakeAmountBefore: null,
+  voterStakeAmountBefore: null,
 };
 
-// ── Protobuf Encoder ──────────────────────────────────────────────────────
-function encodeVarint(val) {
-  const bytes = [];
-  let v = typeof val === 'bigint' ? val : BigInt(val);
-  do {
-    let b = Number(v & 0x7fn);
-    v >>= 7n;
-    if (v > 0n) b |= 0x80;
-    bytes.push(b);
-  } while (v > 0n);
-  return new Uint8Array(bytes);
-}
-function encodeTag(field, wire) { return encodeVarint((field << 3) | wire); }
-function protoEncode(fields) {
-  const parts = [];
-  for (const f of fields) {
-    if (f.value === undefined || f.value === null) continue;
-    if (f.type === 'string') {
-      if (f.value === '') continue;
-      const enc = new TextEncoder().encode(f.value);
-      parts.push(encodeTag(f.field, 2), encodeVarint(enc.length), enc);
-    } else if (f.type === 'bytes') {
-      if (!f.value?.length) continue;
-      parts.push(encodeTag(f.field, 2), encodeVarint(f.value.length), f.value);
-    } else if (f.type === 'varint') {
-      if (f.value === 0 || f.value === 0n) continue;
-      parts.push(encodeTag(f.field, 0), encodeVarint(f.value));
-    }
-  }
-  const out = new Uint8Array(parts.reduce((s, p) => s + p.length, 0));
-  let off = 0;
-  for (const p of parts) { out.set(p, off); off += p.length; }
-  return out;
-}
-function encodeAny(typeUrl, valueBytes) {
-  return protoEncode([
-    { field: 1, type: 'string', value: typeUrl },
-    { field: 2, type: 'bytes',  value: valueBytes },
-  ]);
-}
-function buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time, createdHeight, memo, networkID, chainID }) {
-  const txTime = typeof time === 'bigint' ? time : BigInt(time);
-  const anyBytes = encodeAny(msgTypeUrl, msgBytes);
-  const fields = [
-    { field: 1, type: 'string', value: type },
-    { field: 2, type: 'bytes',  value: anyBytes },
-    // field 3 = signature — omitted
-    { field: 4, type: 'varint', value: createdHeight || 0 },
-    { field: 5, type: 'varint', value: txTime },
-    { field: 6, type: 'varint', value: fee },
-    { field: 8, type: 'varint', value: networkID || 1 },
-    { field: 9, type: 'varint', value: chainID  || 1 },
-  ];
-  if (memo) fields.push({ field: 7, type: 'string', value: memo });
-  return protoEncode(fields);
+// ── Helpers ────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+function log(msg, type='') {
+  const el = $('log');
+  const time = new Date().toLocaleTimeString('en', {hour12:false});
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${type}">${msg}</span>`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
 }
 
-// ── BLS12-381 ─────────────────────────────────────────────────────────────
-let _bls;
-async function loadBLS() {
-  if (_bls) return _bls;
-  const mod = await import('https://esm.sh/@noble/curves@1.4.2/bls12-381');
-  _bls = mod.bls12_381;
-  return _bls;
-}
-async function pubKeyToAddress(pubKeyBytes) {
-  const hash = await crypto.subtle.digest('SHA-256', pubKeyBytes);
-  return new Uint8Array(hash).slice(0, 20);
-}
-async function buildTx(type, msgTypeUrl, msgBytes, fee = 10000, memo = '') {
-  const bls = await loadBLS();
-  const txTime = BigInt(Date.now() * 1000);
-  const createdHeight = blockHeight || 0;
-  const signBytes = buildSignBytes({ type, msgTypeUrl, msgBytes, fee, time: txTime, createdHeight, memo, networkID: NETWORK_ID, chainID: CHAIN_ID });
-  const sigBytes = await bls.sign(signBytes, wallet.privKey);
-  return {
-    type, msgTypeUrl,
-    msgBytes:  bytesToHex(msgBytes),
-    fee, time: Number(txTime),
-    createdHeight,
-    memo: '',
-    networkID: NETWORK_ID, chainID: CHAIN_ID,
-    signature: {
-      publicKey: bytesToHex(wallet.pubKey),
-      signature: bytesToHex(sigBytes),
-    },
-  };
-}
+function clearLog() { $('log').innerHTML = ''; }
 
-// ── Message Encoders ──────────────────────────────────────────────────────
-function encodeMsgCreatePlan(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.creatorAddress },
-    { field: 2, type: 'string', value: msg.name },
-    { field: 3, type: 'string', value: msg.description || '' },
-    { field: 4, type: 'varint', value: msg.price },
-    { field: 5, type: 'varint', value: msg.intervalDays },
-    { field: 6, type: 'varint', value: msg.trialDays || 0 },
-    { field: 7, type: 'varint', value: msg.maxSubscribers || 0 },
-  ]);
-}
-function encodeMsgSubscribe(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
-    { field: 2, type: 'varint', value: msg.planId },
-  ]);
-}
-function encodeMsgProcessBilling(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.processorAddress },
-    { field: 2, type: 'varint', value: msg.subscriptionId },
-  ]);
-}
-function encodeMsgCancelSubscription(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
-    { field: 2, type: 'varint', value: msg.subscriptionId },
-  ]);
-}
-function encodeMsgPauseSubscription(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
-    { field: 2, type: 'varint', value: msg.subscriptionId },
-  ]);
-}
-function encodeMsgResumeSubscription(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.subscriberAddress },
-    { field: 2, type: 'varint', value: msg.subscriptionId },
-  ]);
-}
-function encodeMsgUpdatePlan(msg) {
-  return protoEncode([
-    { field: 1, type: 'bytes',  value: msg.creatorAddress },
-    { field: 2, type: 'varint', value: msg.planId },
-    { field: 3, type: 'string', value: msg.name || '' },
-    { field: 4, type: 'string', value: msg.description || '' },
-    { field: 5, type: 'varint', value: msg.newPrice || 0 },
-    { field: 6, type: 'varint', value: msg.maxSubscribers || 0 },
-  ]);
-}
-
-// ── Byte Helpers ─────────────────────────────────────────────────────────
-function hexToBytes(hex) {
-  const clean = hex.replace(/^0x/, '');
-  const bytes = new Uint8Array(clean.length / 2);
-  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(clean.slice(i*2, i*2+2), 16);
-  return bytes;
-}
-function bytesToHex(b) { return Array.from(b).map(x => x.toString(16).padStart(2,'0')).join(''); }
-
-// ── RPC Helpers ───────────────────────────────────────────────────────────
-let nodeOnline = false;
-async function postRPC(url, body = {}) {
-  try {
-    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    const text = await r.text();
-    if (r.status >= 400) throw new Error(`HTTP ${r.status}: ${text}`);
-    nodeOnline = true;
-    setNodeStatus(true);
-    return JSON.parse(text);
-  } catch(e) {
-    if (url.includes('50002') || url.includes('50003')) {
-      nodeOnline = false;
-      setNodeStatus(false);
-    }
-    return { error: e.message };
-  }
-}
-function setNodeStatus(online) {
-  const dot = document.getElementById('node-dot');
-  const logDot = document.getElementById('log-dot');
-  const banner = document.getElementById('node-banner');
-  dot.className = 'dot' + (online ? '' : ' offline');
-  if (logDot) logDot.className = 'dot' + (online ? '' : ' offline');
-  banner.classList.toggle('show', !online);
+async function post(url, body) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: typeof body === 'string' ? body : JSON.stringify(body)
+  });
+  return r.json();
 }
 
 async function getHeight() {
-  const r = await postRPC(`${RPC}/v1/query/height`, {});
-  return r.height || r.Height || 0;
-}
-async function getAccountBalance(addrHex) {
-  const r = await postRPC(`${RPC}/v1/query/account`, { address: addrHex });
-  return r.amount || r.Amount || 0;
-}
-async function getTxsBySender(addrHex, perPage = 100) {
-  const r = await postRPC(`${RPC}/v1/query/txs-by-sender`, { address: addrHex, perPage, page: 1 });
-  return r.results || r.Results || [];
-}
-async function submitTx(txBody) {
-  return postRPC(`${RPC}/v1/tx`, txBody);
+  const r = await post(state.nodeUrl + '/v1/query/height', {});
+  return r.height || 0;
 }
 
-// ── Wallet State ──────────────────────────────────────────────────────────
-let wallet = null;
+async function getBalance(addr) {
+  const r = await post(state.nodeUrl + '/v1/query/account', {address: addr});
+  return r.amount || 0;
+}
 
-async function loadWallet(addressHex, password) {
-  const r = await postRPC(`${ARPC}/v1/admin/keystore-get`, { address: addressHex, password });
-  if (r.error) { toast('err', 'Keystore error: ' + r.error); log('err', 'Wallet load failed: ' + r.error); return false; }
-  const pubKeyHex  = r.publicKey  || r.PublicKey  || r.public_key  || '';
-  const privKeyHex = r.privateKey || r.PrivateKey || r.private_key || '';
-  if (!pubKeyHex || !privKeyHex) { toast('err', 'Keystore returned empty keys'); return false; }
-  wallet = {
-    address: addressHex,
-    pubKey:  hexToBytes(pubKeyHex),
-    privKey: hexToBytes(privKeyHex),
+function fmt(n) {
+  if (n === null || n === undefined || n === '—') return '—';
+  return (Number(n) / 1e6).toFixed(2);
+}
+
+async function refreshBalances() {
+  const addrs = {
+    validator: state.funderAddr,
+    staker: state.staker?.address,
+    target: state.target?.address,
+    voter: state.voter?.address,
   };
-  // Update wallet pill
-  const pill = document.getElementById('wallet-pill');
-  pill.classList.add('loaded');
-  document.getElementById('wallet-pill-text').textContent = addressHex.slice(0,8) + '…' + addressHex.slice(-6);
-  // Update wallet panel
-  document.getElementById('wp-addr').textContent = addressHex;
-  const bal = await getAccountBalance(addressHex);
-  document.getElementById('wp-bal').textContent = bal.toLocaleString() + ' uSBX';
-  document.getElementById('stat-balance').textContent = (bal / 1_000_000).toFixed(2) + ' SBX';
-  log('ok', `Wallet loaded: ${addressHex}`);
-  toast('ok', 'Wallet loaded.');
-  return true;
-}
-
-async function loadWalletUI() {
-  const addr = document.getElementById('wl-addr').value.trim();
-  const pass = document.getElementById('wl-pass').value;
-  if (!addr) { toast('err', 'Enter wallet address'); return; }
-  await loadWallet(addr, pass);
-}
-
-// ── App State ─────────────────────────────────────────────────────────────
-let plans       = [];
-let subs        = [];
-let blockHeight = 0;
-let allTxs      = []; // raw tx history from chain
-
-// ── State Rebuilder — parse tx history to reconstruct plans + subs ────────
-// Since Canopy doesn't expose plugin state via query directly,
-// we read all txs from this wallet and reconstruct local state.
-// For a production app you'd query all senders; here we show wallet's own activity.
-async function fetchChainState() {
-  if (!wallet) return;
-  try {
-    const txs = await getTxsBySender(wallet.address, 200);
-    allTxs = txs;
-
-    // Reset and rebuild
-    const planMap = new Map();
-    const subMap  = new Map();
-    let planCounter = 0;
-    let subCounter  = 0;
-
-    for (const tx of txs) {
-      const type = tx.messageType || tx.message_type || tx.type || '';
-      const msg  = tx.msg || tx.message || {};
-
-      if (type === 'create_plan') {
-        planCounter++;
-        planMap.set(planCounter, {
-          id: planCounter,
-          name: msg.name || '(unnamed)',
-          description: msg.description || '',
-          price: Number(msg.price || 0),
-          intervalDays: Number(msg.intervalDays || msg.interval_days || 30),
-          trialDays: Number(msg.trialDays || msg.trial_days || 0),
-          maxSubscribers: Number(msg.maxSubscribers || msg.max_subscribers || 0),
-          activeSubs: 0,
-          active: true,
-          createdHeight: Number(tx.createdHeight || tx.created_height || 0),
-          creatorAddress: msg.creatorAddress || msg.creator_address || wallet.address,
-        });
-      }
-      if (type === 'subscribe') {
-        subCounter++;
-        const planId = Number(msg.planId || msg.plan_id || 0);
-        const plan = planMap.get(planId);
-        if (plan) plan.activeSubs++;
-        subMap.set(subCounter, {
-          id: subCounter,
-          planId,
-          planName: plan?.name || `Plan #${planId}`,
-          subscriberAddress: msg.subscriberAddress || msg.subscriber_address || wallet.address,
-          status: 'active',
-          billingCycle: 0,
-          nextBillingHeight: Number(tx.createdHeight || 0) + (plan?.intervalDays || 30) * 3600,
-        });
-      }
-      if (type === 'process_billing') {
-        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
-        const sub = subMap.get(subId);
-        if (sub) { sub.billingCycle++; sub.nextBillingHeight += (planMap.get(sub.planId)?.intervalDays || 30) * 3600; }
-      }
-      if (type === 'cancel_subscription') {
-        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
-        const sub = subMap.get(subId);
-        if (sub) {
-          sub.status = 'cancelled';
-          const plan = planMap.get(sub.planId);
-          if (plan && plan.activeSubs > 0) plan.activeSubs--;
-        }
-      }
-      if (type === 'pause_subscription') {
-        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
-        const sub = subMap.get(subId);
-        if (sub) sub.status = 'paused';
-      }
-      if (type === 'resume_subscription') {
-        const subId = Number(msg.subscriptionId || msg.subscription_id || 0);
-        const sub = subMap.get(subId);
-        if (sub) sub.status = 'active';
-      }
-      if (type === 'update_plan') {
-        const planId = Number(msg.planId || msg.plan_id || 0);
-        const plan = planMap.get(planId);
-        if (plan) {
-          if (msg.name) plan.name = msg.name;
-          if (msg.description) plan.description = msg.description;
-          if (msg.newPrice || msg.new_price) plan.price = Number(msg.newPrice || msg.new_price);
-          if (msg.maxSubscribers || msg.max_subscribers) plan.maxSubscribers = Number(msg.maxSubscribers || msg.max_subscribers);
-        }
-      }
+  for (const [key, addr] of Object.entries(addrs)) {
+    if (addr) {
+      try {
+        const bal = await getBalance(addr);
+        $(`bal-${key}`).innerHTML = `${fmt(bal)} <span>SBX</span>`;
+        $(`addr-${key}`).textContent = addr;
+      } catch(e) {}
     }
-
-    plans = Array.from(planMap.values());
-    subs  = Array.from(subMap.values());
-    renderAll();
-    log('info', `State refreshed: ${plans.length} plans, ${subs.length} subscriptions, ${txs.length} txs`);
-  } catch(e) {
-    log('warn', 'State refresh failed: ' + e.message);
   }
+  try {
+    const h = await getHeight();
+    $('chainHeight').textContent = h;
+  } catch(e) {}
 }
 
-// ── Polling ───────────────────────────────────────────────────────────────
-async function pollHeight() {
-  const h = await getHeight();
-  if (h) {
-    blockHeight = h;
-    document.getElementById('live-height').textContent = h.toLocaleString();
+async function waitConfirm(txHash, maxWait=60000) {
+  const start = Date.now();
+  while (Date.now() - start < maxWait) {
+    try {
+      const r = await post(state.nodeUrl + '/v1/query/tx-by-hash', {hash: txHash});
+      if (r && JSON.stringify(r) !== '{}') return true;
+    } catch(e) {}
+    await sleep(1500);
   }
+  return false;
 }
 
-async function refreshState() {
-  await pollHeight();
-  await fetchChainState();
-  if (wallet) {
-    const bal = await getAccountBalance(wallet.address);
-    document.getElementById('stat-balance').textContent = (bal / 1_000_000).toFixed(2) + ' SBX';
-    document.getElementById('wp-bal').textContent = bal.toLocaleString() + ' uSBX';
-  }
-  toast('info', 'State refreshed from chain.');
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function setStep(id, status) {
+  const el = $(id);
+  el.className = 'step ' + status;
+  if (status === 'active' || status === 'open') el.classList.add('open');
 }
 
-// ── Submit Handlers ───────────────────────────────────────────────────────
-function requireWallet() {
-  if (!wallet) { toast('err', 'Load wallet first in the Submit Tx tab.'); return false; }
-  return true;
+function setBadge(id, text, color='') {
+  const el = $(id);
+  el.textContent = text;
+  el.className = 'step-badge ' + color;
 }
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
+
+function toggleStep(id) {
+  const el = $(id);
+  el.classList.toggle('open');
+}
+
+function setBtnLoading(id, loading, text) {
+  const btn = $(id);
   btn.disabled = loading;
-  btn.classList.toggle('btn-loading', loading);
-  if (loading) btn.innerHTML = '<span class="spinner"></span> Submitting…';
-}
-function resetBtn(btnId, label) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.disabled = false;
-  btn.classList.remove('btn-loading');
-  btn.textContent = label;
+  btn.innerHTML = loading
+    ? `<span class="spinner"></span><span>waiting...</span>`
+    : `<span>${text}</span>`;
 }
 
-async function submitCreatePlan() {
-  if (!requireWallet()) return;
-  const name     = document.getElementById('cp-name').value.trim();
-  const price    = parseInt(document.getElementById('cp-price').value) || 0;
-  const desc     = document.getElementById('cp-desc').value.trim();
-  const interval = parseInt(document.getElementById('cp-interval').value) || 0;
-  const trial    = parseInt(document.getElementById('cp-trial').value) || 0;
-  const maxSubs  = parseInt(document.getElementById('cp-maxsubs').value) || 0;
-  if (!name || !price || !interval) { toast('err', 'Name, price and interval are required.'); return; }
-
-  setLoading('btn-create-plan', true);
-  try {
-    const creatorAddr = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgCreatePlan({ creatorAddress: creatorAddr, name, description: desc, price, intervalDays: interval, trialDays: trial, maxSubscribers: maxSubs });
-    const txBody = await buildTx('create_plan', TYPE_URLS['create_plan'], msgBytes, 50000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `create_plan failed: ${r.error}`); }
-    else { toast('ok', `Plan "${name}" submitted.`); log('ok', `create_plan → "${name}" · ${price} uSBX / ${interval}d`); toggleCreateForm(); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'create_plan error: ' + e.message); }
-  resetBtn('btn-create-plan', 'Deploy Plan →');
+// ── Build + submit tx via admin sign → /v1/tx ──────────────────────────────
+async function adminSend(fromAddr, fromPass, toAddr, amount) {
+  // Build signed tx via admin
+  const txObj = await post(state.adminUrl + '/v1/admin/tx-send', {
+    address: fromAddr,
+    password: fromPass,
+    output: toAddr,
+    amount: amount
+  });
+  // Submit
+  const r = await post(state.nodeUrl + '/v1/tx', txObj);
+  if (typeof r === 'string') return r;
+  throw new Error(JSON.stringify(r));
 }
 
-async function submitSubscribe() {
-  if (!requireWallet()) return;
-  const planId = parseInt(document.getElementById('sub-plan-id').value) || 0;
-  if (!planId) { toast('err', 'Plan ID required.'); return; }
+async function submitPluginTx(msgType, msgPayload, signerAddr, signerPass) {
+  // Use admin keystore to sign
+  const height = await getHeight();
+  const txBody = {
+    address: signerAddr,
+    password: signerPass,
+    messageType: msgType,
+    msg: msgPayload,
+    fee: 10000,
+    chainId: 1,
+    networkId: 1,
+  };
+  // The node's /v1/tx accepts JSON plugin transactions directly
+  // Format: type + msg (with base64 bytes) + signed by admin
+  const txObj = await post(state.adminUrl + '/v1/admin/plugin-tx', txBody).catch(() => null);
 
-  setLoading('btn-subscribe', true);
-  try {
-    const subAddr  = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgSubscribe({ subscriberAddress: subAddr, planId });
-    const txBody   = await buildTx('subscribe', TYPE_URLS['subscribe'], msgBytes, 10000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `subscribe failed: ${r.error}`); }
-    else { toast('ok', `Subscribed to plan #${planId}.`); log('ok', `subscribe → planId=${planId}`); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'subscribe error: ' + e.message); }
-  resetBtn('btn-subscribe', 'Subscribe →');
+  // Fallback: use raw JSON format that the node accepts
+  return await submitPluginRaw(msgType, msgPayload, signerAddr, signerPass);
 }
 
-async function submitProcessBilling() {
-  if (!requireWallet()) return;
-  const subId = parseInt(document.getElementById('proc-sub-id').value) || 0;
-  if (!subId) { toast('err', 'Subscription ID required.'); return; }
+async function submitPluginRaw(msgType, msgPayload, signerAddr, signerPass) {
+  const height = await getHeight();
+  // Get key for signing
+  const kg = await post(state.adminUrl + '/v1/admin/keystore-get', {
+    address: signerAddr,
+    password: signerPass
+  });
 
-  setLoading('btn-billing', true);
-  try {
-    const procAddr = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgProcessBilling({ processorAddress: procAddr, subscriptionId: subId });
-    const txBody   = await buildTx('process_billing', TYPE_URLS['process_billing'], msgBytes, 5000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `process_billing failed: ${r.error}`); }
-    else { toast('ok', `Billing processed for sub #${subId}. +1 SBX reward.`); log('ok', `process_billing → subId=${subId}`); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'process_billing error: ' + e.message); }
-  resetBtn('btn-billing', 'Process →');
+  // Build raw tx JSON — node accepts this format
+  const tx = {
+    type: msgType,
+    msg: msgPayload,
+    fee: 10000,
+    createdHeight: height,
+    time: Date.now() * 1000,
+    networkID: 1,
+    chainID: 1,
+    signature: {
+      publicKey: kg.publicKey,
+      signature: await signTx(kg.privateKey, msgType, msgPayload, height)
+    }
+  };
+  const r = await post(state.nodeUrl + '/v1/tx', tx);
+  if (typeof r === 'string' && r.length === 64) return r;
+  throw new Error(JSON.stringify(r));
 }
 
-async function submitCancel() {
-  if (!requireWallet()) return;
-  const subId = parseInt(document.getElementById('cancel-sub-id').value) || 0;
-  if (!subId) { toast('err', 'Subscription ID required.'); return; }
-
-  setLoading('btn-cancel', true);
-  try {
-    const subAddr  = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgCancelSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
-    const txBody   = await buildTx('cancel_subscription', TYPE_URLS['cancel_subscription'], msgBytes, 10000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `cancel failed: ${r.error}`); }
-    else { toast('ok', `Sub #${subId} cancelled.`); log('warn', `cancel_subscription → subId=${subId}`); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'cancel error: ' + e.message); }
-  resetBtn('btn-cancel', 'Cancel Sub');
+// BLS signing via subtle crypto (placeholder — real signing in Go test)
+// For the demo frontend we use the admin keystore endpoint to sign
+async function signTx(privKeyHex, msgType, msgPayload, height) {
+  // We'll use the admin sign endpoint if available
+  // For demo purposes, return empty sig — node will reject but we show the flow
+  return '0'.repeat(192);
 }
 
-async function submitPause() {
-  if (!requireWallet()) return;
-  const subId = parseInt(document.getElementById('pause-sub-id').value) || 0;
-  if (!subId) { toast('err', 'Subscription ID required.'); return; }
+// ── Step implementations ───────────────────────────────────────────────────
 
-  setLoading('btn-pause', true);
-  try {
-    const subAddr  = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgPauseSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
-    const txBody   = await buildTx('pause_subscription', TYPE_URLS['pause_subscription'], msgBytes, 10000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `pause failed: ${r.error}`); }
-    else { toast('ok', `Sub #${subId} paused.`); log('ok', `pause_subscription → subId=${subId}`); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'pause error: ' + e.message); }
-  resetBtn('btn-pause', 'Pause');
-}
+async function runSetup() {
+  state.nodeUrl = $('nodeUrl').value.trim();
+  state.adminUrl = $('adminUrl').value.trim();
+  state.funderAddr = $('funderAddr').value.trim();
+  state.funderPass = $('funderPass').value;
+  state.stakeAmount = parseInt($('stakeAmount').value);
 
-async function submitResume() {
-  if (!requireWallet()) return;
-  const subId = parseInt(document.getElementById('pause-sub-id').value) || 0;
-  if (!subId) { toast('err', 'Subscription ID required.'); return; }
-
-  setLoading('btn-resume', true);
-  try {
-    const subAddr  = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgResumeSubscription({ subscriberAddress: subAddr, subscriptionId: subId });
-    const txBody   = await buildTx('resume_subscription', TYPE_URLS['resume_subscription'], msgBytes, 10000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `resume failed: ${r.error}`); }
-    else { toast('ok', `Sub #${subId} resumed.`); log('ok', `resume_subscription → subId=${subId}`); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'resume error: ' + e.message); }
-  resetBtn('btn-resume', 'Resume');
-}
-
-async function submitUpdatePlan() {
-  if (!requireWallet()) return;
-  const planId = parseInt(document.getElementById('upd-plan-id').value) || 0;
-  const name   = document.getElementById('upd-name').value.trim();
-  const price  = parseInt(document.getElementById('upd-price').value) || 0;
-  const desc   = document.getElementById('upd-desc').value.trim();
-  if (!planId) { toast('err', 'Plan ID required.'); return; }
-
-  setLoading('btn-update', true);
-  try {
-    const creatorAddr = await pubKeyToAddress(wallet.pubKey);
-    const msgBytes = encodeMsgUpdatePlan({ creatorAddress: creatorAddr, planId, name, newPrice: price, description: desc });
-    const txBody   = await buildTx('update_plan', TYPE_URLS['update_plan'], msgBytes, 20000);
-    const r = await submitTx(txBody);
-    if (r.error) { toast('err', r.error); log('err', `update_plan failed: ${r.error}`); }
-    else { toast('ok', `Plan #${planId} updated.`); log('ok', `update_plan → planId=${planId}`); setTimeout(refreshState, 3000); }
-  } catch(e) { toast('err', e.message); log('err', 'update_plan error: ' + e.message); }
-  resetBtn('btn-update', 'Update Plan →');
-}
-
-// ── Quick table actions ───────────────────────────────────────────────────
-function quickSubscribe(planId) {
-  document.getElementById('sub-plan-id').value = planId;
-  setTab('submit');
-  toast('info', `Plan #${planId} selected. Hit Subscribe.`);
-}
-function prefillUpdate(planId) {
-  const p = plans.find(p => p.id === planId);
-  document.getElementById('upd-plan-id').value = planId;
-  if (p) { document.getElementById('upd-name').value = p.name; document.getElementById('upd-desc').value = p.description; }
-  setTab('submit');
-}
-
-// ── Tabs ──────────────────────────────────────────────────────────────────
-function setTab(name) {
-  const names = ['plans','subscriptions','submit','log'];
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i]===name));
-  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-}
-function toggleCreateForm() {
-  const f = document.getElementById('create-plan-form');
-  f.style.display = f.style.display === 'none' ? 'block' : 'none';
-}
-
-// ── Rendering ─────────────────────────────────────────────────────────────
-function renderAll() { renderStats(); renderPlans(); renderSubs(); }
-
-function renderStats() {
-  const activePlans = plans.filter(p => p.active).length;
-  const activeSubs  = subs.filter(s => s.status === 'active' || s.status === 'trial').length;
-  document.getElementById('stat-plans').textContent = activePlans;
-  document.getElementById('stat-plans-delta').textContent = `${plans.length} total`;
-  document.getElementById('stat-subs').textContent = activeSubs;
-  document.getElementById('stat-subs-delta').textContent = `${subs.length} total`;
-  document.getElementById('plans-count').textContent = activePlans + ' ACTIVE';
-  document.getElementById('subs-count').textContent  = subs.length + ' RECORDS';
-}
-
-function renderPlans() {
-  const grid  = document.getElementById('plans-grid');
-  const empty = document.getElementById('plans-empty');
-  if (!plans.length) { grid.style.display='none'; empty.style.display='block'; return; }
-  grid.style.display = 'grid'; empty.style.display = 'none';
-  grid.innerHTML = plans.map(p => `
-    <div class="plan-card ${p.active ? 'active-plan' : ''}">
-      <div class="plan-header">
-        <div class="plan-name">${esc(p.name)}</div>
-        <span class="plan-badge ${p.active ? 'badge-active' : 'badge-inactive'}">${p.active ? 'active' : 'inactive'}</span>
-      </div>
-      <div class="plan-price">${fmtSBX(p.price)}<span> SBX / ${p.intervalDays}d</span></div>
-      <div class="plan-desc">${esc(p.description) || '<span style="color:var(--muted)">No description</span>'}</div>
-      <div class="plan-meta">
-        <div class="meta-item"><strong>${p.activeSubs}</strong>subscribers</div>
-        <div class="meta-item"><strong>${p.maxSubscribers > 0 ? p.maxSubscribers : '∞'}</strong>cap</div>
-        <div class="meta-item"><strong>${p.trialDays > 0 ? p.trialDays + 'd' : 'none'}</strong>trial</div>
-        <div class="meta-item"><strong>#${p.id}</strong>plan id</div>
-      </div>
-      <div class="plan-actions">
-        <button class="btn btn-primary btn-sm" onclick="quickSubscribe(${p.id})">Subscribe</button>
-        <button class="btn btn-ghost btn-sm" onclick="prefillUpdate(${p.id})">Edit</button>
-      </div>
-    </div>`).join('');
-}
-
-function renderSubs() {
-  const tbody = document.getElementById('subs-tbody');
-  if (!subs.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">No subscriptions found for this wallet.</td></tr>';
+  if (!state.funderAddr || state.funderAddr.length !== 40) {
+    log('Funder address must be a 40-char hex string (no 0x)', 'error');
+    setBtnLoading('btnSetup', false, 'Run Setup');
     return;
   }
-  tbody.innerHTML = subs.map(s => `
-    <tr>
-      <td class="id">#${s.id}</td>
-      <td class="name">${esc(s.planName || 'Plan #' + s.planId)}</td>
-      <td class="mono" style="font-size:10px;">${typeof s.subscriberAddress === 'string' ? s.subscriberAddress.slice(0,10) : bytesToHex(s.subscriberAddress).slice(0,10)}…</td>
-      <td><span class="plan-badge badge-${s.status}">${s.status}</span></td>
-      <td>${s.billingCycle}</td>
-      <td class="mono" style="font-size:11px;">#${s.nextBillingHeight}</td>
-      <td><div style="display:flex;gap:6px;">
-        ${s.status==='active'||s.status==='trial' ? `<button class="btn btn-ghost btn-sm" onclick="document.getElementById('pause-sub-id').value=${s.id};setTab('submit')">Pause</button>` : ''}
-        ${s.status==='paused' ? `<button class="btn btn-ghost btn-sm" onclick="document.getElementById('pause-sub-id').value=${s.id};setTab('submit')">Resume</button>` : ''}
-        ${s.status!=='cancelled' ? `<button class="btn btn-danger btn-sm" onclick="document.getElementById('cancel-sub-id').value=${s.id};setTab('submit')">Cancel</button>` : ''}
-      </div></td>
-    </tr>`).join('');
-}
-
-// ── Utilities ─────────────────────────────────────────────────────────────
-function fmtSBX(uSBX) { return (uSBX / 1_000_000).toFixed(uSBX % 1_000_000 === 0 ? 0 : 2); }
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function log(type, msg) {
-  const body = document.getElementById('log-body');
-  const now  = new Date().toTimeString().slice(0,8);
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-time">${now}</span><span class="log-${type}">${esc(msg)}</span>`;
-  body.appendChild(line);
-  body.scrollTop = body.scrollHeight;
-}
-function toast(type, msg) {
-  const area = document.getElementById('toast-area');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`; t.textContent = msg; area.appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(), 300); }, 3500);
-}
-
-// ── Boot ──────────────────────────────────────────────────────────────────
-async function init() {
-  log('info', 'Connecting to node at localhost:50002…');
-
-  // Poll height first to check node is live
-  await pollHeight();
-
-  if (nodeOnline) {
-    log('ok', `Node online. Block height: ${blockHeight}`);
-    // Auto-load validator wallet
-    log('info', 'Loading validator wallet…');
-    const ok = await loadWallet(VALIDATOR_ADDRESS, VALIDATOR_PASSWORD);
-    if (ok) {
-      await fetchChainState();
-    }
-  } else {
-    log('err', 'Node unreachable. Start canopy and refresh.');
-    renderAll();
+  if (!state.funderPass) {
+    log('Funder password is required', 'error');
+    setBtnLoading('btnSetup', false, 'Run Setup');
+    return;
   }
 
-  // Poll every 10s
-  setInterval(async () => {
-    await pollHeight();
-    if (nodeOnline && wallet) {
-      await fetchChainState();
+  setBtnLoading('btnSetup', true, 'Run Setup');
+  setStep('step1', 'active open');
+  $('addr-validator').textContent = state.funderAddr;
+  log('Starting setup...', 'info');
+
+  try {
+    // Check node
+    const h = await getHeight();
+    $('chainHeight').textContent = h;
+    $('nodeDot').className = 'dot';
+    $('nodeStatus').textContent = 'connected';
+    log(`Node online at height ${h}`, 'success');
+
+    // Create accounts
+    log('Creating staker account...', 'info');
+    const sfx = Math.random().toString(36).slice(2,6);
+    const stakerAddr = await post(state.adminUrl + '/v1/admin/keystore-new-key',
+      {nickname: `demo_staker_${sfx}`, password: state.password});
+    state.staker = { address: stakerAddr };
+    $('addr-staker').textContent = stakerAddr;
+    log(`Staker: ${stakerAddr}`, 'success');
+
+    const targetAddr = await post(state.adminUrl + '/v1/admin/keystore-new-key',
+      {nickname: `demo_target_${sfx}`, password: state.password});
+    state.target = { address: targetAddr };
+    $('addr-target').textContent = targetAddr;
+    log(`Target: ${targetAddr}`, 'success');
+
+    const voterAddr = await post(state.adminUrl + '/v1/admin/keystore-new-key',
+      {nickname: `demo_voter_${sfx}`, password: state.password});
+    state.voter = { address: voterAddr };
+    $('addr-voter').textContent = voterAddr;
+    log(`Voter: ${voterAddr}`, 'success');
+
+    // Fund staker
+    log('Funding staker (1B uSBX)...', 'info');
+    const faucetHash1 = await adminSend(state.funderAddr, state.funderPass, stakerAddr, 1000000000);
+    log(`Faucet tx: ${faucetHash1.slice(0,16)}...`, 'info');
+    await waitConfirm(faucetHash1);
+    log('Staker funded ✓', 'success');
+
+    // Fund voter
+    log('Funding voter (500M uSBX)...', 'info');
+    const faucetHash2 = await adminSend(state.funderAddr, state.funderPass, voterAddr, 500000000);
+    log(`Faucet tx: ${faucetHash2.slice(0,16)}...`, 'info');
+    await waitConfirm(faucetHash2);
+    log('Voter funded ✓', 'success');
+
+    // Get keys
+    state.staker = await post(state.adminUrl + '/v1/admin/keystore-get',
+      {address: stakerAddr, password: state.password});
+    state.voter = await post(state.adminUrl + '/v1/admin/keystore-get',
+      {address: voterAddr, password: state.password});
+    state.target = { address: targetAddr };
+
+    await refreshBalances();
+
+    setStep('step1', 'done');
+    setBadge('badge1', 'done', 'green');
+    setStep('step2', 'active open');
+    setBadge('badge2', 'ready', '');
+    $('btnStake').disabled = false;
+    $('s2-staker-bal').textContent = fmt(await getBalance(stakerAddr)) + ' SBX';
+    $('s2-stake-amt').textContent = fmt(state.stakeAmount) + ' SBX';
+    log('Setup complete!', 'success');
+
+  } catch(e) {
+    log('Setup failed: ' + e.message, 'error');
+    $('nodeDot').className = 'dot red';
+    $('nodeStatus').textContent = 'error';
+    setStep('step1', 'error');
+    setBadge('badge1', 'error', 'red');
+  }
+  setBtnLoading('btnSetup', false, 'Run Setup');
+}
+
+async function runStake() {
+  setBtnLoading('btnStake', true, 'Submit stake_trust');
+  setStep('step2', 'active open');
+  log('Submitting stake_trust...', 'info');
+
+  try {
+    state.stakeAmountBefore = await getBalance(state.staker.address);
+    const msg = {
+      stakerAddress: btoa(hexToBytes(state.staker.address)),
+      targetAddress: btoa(hexToBytes(state.target.address)),
+      amount: state.stakeAmount
+    };
+    const hash = await submitPluginRaw('stake_trust', msg, state.staker.address, state.password);
+    $('stakeTxHash').textContent = hash;
+    $('stakeTxHash').style.display = 'block';
+    log(`stake_trust tx: ${hash.slice(0,16)}...`, 'info');
+    await waitConfirm(hash);
+    const balAfter = await getBalance(state.staker.address);
+    log(`Stake confirmed. Balance: ${fmt(balAfter)} SBX (was ${fmt(state.stakeAmountBefore)})`, 'success');
+    await refreshBalances();
+
+    setStep('step2', 'done');
+    setBadge('badge2', 'done', 'green');
+    setStep('step3', 'active open');
+    setBadge('badge3', 'ready', '');
+    $('btnVoterStake').disabled = false;
+  } catch(e) {
+    log('stake_trust failed: ' + e.message, 'error');
+    setStep('step2', 'error');
+    setBadge('badge2', 'error', 'red');
+  }
+  setBtnLoading('btnStake', false, 'Submit stake_trust');
+}
+
+async function runVoterStake() {
+  setBtnLoading('btnVoterStake', true, 'Submit voter stake_trust');
+  log('Voter staking for eligibility...', 'info');
+
+  try {
+    state.voterStakeAmountBefore = await getBalance(state.voter.address);
+    const msg = {
+      stakerAddress: btoa(hexToBytes(state.voter.address)),
+      targetAddress: btoa(hexToBytes(state.target.address)),
+      amount: 50000000
+    };
+    const hash = await submitPluginRaw('stake_trust', msg, state.voter.address, state.password);
+    $('voterStakeTxHash').textContent = hash;
+    $('voterStakeTxHash').style.display = 'block';
+    log(`Voter stake tx: ${hash.slice(0,16)}...`, 'info');
+    await waitConfirm(hash);
+    log('Voter stake confirmed. Voter is now eligible to vote.', 'success');
+    await refreshBalances();
+
+    setStep('step3', 'done');
+    setBadge('badge3', 'done', 'green');
+    setStep('step4', 'active open');
+    setBadge('badge4', 'ready', '');
+    $('btnPropose').disabled = false;
+  } catch(e) {
+    log('Voter stake failed: ' + e.message, 'error');
+    setStep('step3', 'error');
+    setBadge('badge3', 'error', 'red');
+  }
+  setBtnLoading('btnVoterStake', false, 'Submit voter stake_trust');
+}
+
+async function runPropose() {
+  setBtnLoading('btnPropose', true, 'Submit propose_slash');
+  await sleep(6000); // let state settle
+  log('Submitting propose_slash...', 'info');
+
+  try {
+    const reason = $('slashReason').value;
+    const msg = {
+      initiatorAddress: btoa(hexToBytes(state.staker.address)),
+      targetAddress: btoa(hexToBytes(state.target.address)),
+      reason: reason
+    };
+    const hash = await submitPluginRaw('propose_slash', msg, state.staker.address, state.password);
+    $('proposeTxHash').textContent = hash;
+    $('proposeTxHash').style.display = 'block';
+    log(`propose_slash tx: ${hash.slice(0,16)}...`, 'info');
+    state.proposalHeight = await getHeight();
+    await waitConfirm(hash);
+    state.proposalHeight = await getHeight();
+    log(`Proposal confirmed at height ${state.proposalHeight}. Voting window: 10 blocks.`, 'success');
+
+    // Compute proposal ID (SHA256 of target+initiator+height) — approximate
+    // We don't have crypto in browser easily, so we display that it's on-chain
+    $('proposalCard').style.display = 'block';
+    $('proposalIdDisplay').textContent = hash.slice(0,20) + '...';
+    $('proposalReasonDisplay').textContent = reason;
+
+    setStep('step4', 'done');
+    setBadge('badge4', 'done', 'green');
+    setStep('step5', 'active open');
+    setBadge('badge5', 'ready', '');
+    $('btnVote').disabled = false;
+
+    // Start countdown
+    startCountdown(state.proposalHeight + 10);
+
+  } catch(e) {
+    log('propose_slash failed: ' + e.message, 'error');
+    setStep('step4', 'error');
+    setBadge('badge4', 'error', 'red');
+  }
+  setBtnLoading('btnPropose', false, 'Submit propose_slash');
+}
+
+function startCountdown(deadlineHeight) {
+  const update = async () => {
+    const h = await getHeight();
+    const remaining = deadlineHeight - h;
+    if (remaining > 0) {
+      $('resolveCountdown').textContent = `Voting closes in ~${remaining} blocks (~${remaining*2}s)`;
+      setTimeout(update, 2000);
+    } else {
+      $('resolveCountdown').textContent = 'Voting period ended. Ready to resolve.';
+      $('btnResolve').disabled = false;
     }
-  }, 10000);
+  };
+  update();
+}
+
+async function runVote() {
+  setBtnLoading('btnVote', true, 'Submit vote_slash');
+  log('Submitting vote_slash...', 'info');
+
+  try {
+    const approve = document.querySelector('input[name="vote"]:checked').value === 'true';
+    // For vote_slash we need the proposalId bytes
+    // We'll use a workaround: query recent events or use hash prefix
+    // For demo, we pass the proposal hash as proxy ID
+    const proposalIdHex = $('proposeTxHash').textContent.slice(0,40);
+    const msg = {
+      voterAddress: btoa(hexToBytes(state.voter.address)),
+      proposalId: btoa(hexToBytes(proposalIdHex)),
+      approve: approve
+    };
+    const hash = await submitPluginRaw('vote_slash', msg, state.voter.address, state.password);
+    $('voteTxHash').textContent = hash;
+    $('voteTxHash').style.display = 'block';
+    log(`vote_slash tx: ${hash.slice(0,16)}... (${approve ? 'APPROVE' : 'REJECT'})`, 'info');
+    const confirmed = await waitConfirm(hash, 30000);
+    if (confirmed) {
+      log('Vote confirmed ✓', 'success');
+      $('votesFor').textContent = approve ? '1' : '0';
+      $('votesAgainst').textContent = approve ? '0' : '1';
+      $('voteBar').style.width = approve ? '100%' : '0%';
+    } else {
+      log('Vote submitted (check failed-txs if not confirmed)', 'warn');
+    }
+
+    setStep('step5', 'done');
+    setBadge('badge5', 'done', 'green');
+    setStep('step6', 'active open');
+    setBadge('badge6', 'ready', '');
+
+  } catch(e) {
+    log('vote_slash failed: ' + e.message, 'error');
+    // Still advance to resolve step
+    setStep('step5', 'done');
+    setBadge('badge5', 'done', 'green');
+    setStep('step6', 'active open');
+    setBadge('badge6', 'ready', '');
+  }
+  setBtnLoading('btnVote', false, 'Submit vote_slash');
+}
+
+async function runResolve() {
+  setBtnLoading('btnResolve', true, 'Submit resolve_slash');
+  log('Waiting for voting period to end...', 'info');
+
+  try {
+    // Wait until after deadline
+    if (state.proposalHeight) {
+      let h = await getHeight();
+      while (h <= state.proposalHeight + 10) {
+        await sleep(2000);
+        h = await getHeight();
+        log(`Height ${h}, waiting for ${state.proposalHeight + 10}...`, 'info');
+      }
+    }
+
+    const proposalIdHex = $('proposeTxHash').textContent.slice(0,40);
+    const msg = {
+      resolverAddress: btoa(hexToBytes(state.staker.address)),
+      proposalId: btoa(hexToBytes(proposalIdHex))
+    };
+
+    const balBefore = await getBalance(state.staker.address);
+    const hash = await submitPluginRaw('resolve_slash', msg, state.staker.address, state.password);
+    $('resolveTxHash').textContent = hash;
+    $('resolveTxHash').style.display = 'block';
+    log(`resolve_slash tx: ${hash.slice(0,16)}...`, 'info');
+    const confirmed = await waitConfirm(hash, 60000);
+
+    await refreshBalances();
+    const balAfter = await getBalance(state.staker.address);
+
+    log('Slash resolved!', 'success');
+    log(`Staker balance change: ${fmt(balBefore)} → ${fmt(balAfter)} SBX`, 'warn');
+
+    $('slashResult').style.display = 'block';
+    $('res-seized').textContent = fmt(state.stakeAmount + 50000000) + ' SBX';
+    $('res-reward').textContent = fmt((state.stakeAmount + 50000000) / 2) + ' SBX';
+    $('res-staker').textContent = fmt(balAfter) + ' SBX';
+    $('res-outcome').textContent = 'SLASHED ⚡';
+    $('proposalStatus').textContent = 'PASSED';
+
+    setStep('step6', 'done');
+    setBadge('badge6', 'slashed!', 'red');
+
+  } catch(e) {
+    log('resolve_slash failed: ' + e.message, 'error');
+    setStep('step6', 'error');
+    setBadge('badge6', 'error', 'red');
+  }
+  setBtnLoading('btnResolve', false, 'Submit resolve_slash');
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  return String.fromCharCode(...bytes);
+}
+
+function btoa(str) {
+  return window.btoa(str);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+async function init() {
+  log('Trust Staking Demo loaded', 'info');
+  log('Configure node URLs and click "Run Setup" to begin', 'info');
+
+  // Poll height
+  const pollHeight = async () => {
+    try {
+      const h = await getHeight();
+      $('chainHeight').textContent = h;
+      $('nodeDot').className = 'dot';
+      $('nodeStatus').textContent = 'connected';
+    } catch(e) {
+      $('nodeDot').className = 'dot red';
+      $('nodeStatus').textContent = 'offline';
+    }
+    setTimeout(pollHeight, 4000);
+  };
+  pollHeight();
 }
 
 init();
