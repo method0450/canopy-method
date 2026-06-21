@@ -838,17 +838,20 @@ function setBtnLoading(id, loading, text) {
 
 // ── Build + submit tx via admin sign → /v1/tx ──────────────────────────────
 async function adminSend(fromAddr, fromPass, toAddr, amount) {
-  // Build signed tx via admin
-  const txObj = await post(state.adminUrl + '/v1/admin/tx-send', {
-    address: fromAddr,
-    password: fromPass,
-    output: toAddr,
-    amount: amount
+  const resp = await fetch(state.adminUrl + '/v1/admin/tx-send', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({address: fromAddr, password: fromPass, output: toAddr, amount: amount})
   });
-  // Submit
-  const r = await post(state.nodeUrl + '/v1/tx', txObj);
-  if (typeof r === 'string') return r;
-  throw new Error(JSON.stringify(r));
+  const rawTx = await resp.text();
+  const r = await fetch(state.nodeUrl + '/v1/tx', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: rawTx
+  });
+  const hash = await r.json();
+  if (typeof hash === 'string' && hash.length >= 32) return hash;
+  throw new Error(JSON.stringify(hash));
 }
 
 async function submitPluginTx(msgType, msgPayload, signerAddr, signerPass) {
